@@ -253,8 +253,8 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ userRole, id }) 
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={`flex items-center gap-2 px-6 py-3 rounded-xl whitespace-nowrap transition-all duration-300 font-medium ${activeTab === tab.id
-                                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
-                                : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+                            ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
+                            : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
                             }`}
                     >
                         <tab.icon size={18} />
@@ -384,8 +384,8 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ userRole, id }) 
                                                     <div className="flex items-center gap-3">
                                                         <span className="text-xs text-slate-500">{day.hours} Hours</span>
                                                         <span className={`px-2 py-1 rounded-full text-xs font-bold ${day.status === 'Present' ? 'bg-emerald-100 text-emerald-700' :
-                                                                day.status === 'Absent' ? 'bg-red-100 text-red-700' :
-                                                                    'bg-amber-100 text-amber-700'
+                                                            day.status === 'Absent' ? 'bg-red-100 text-red-700' :
+                                                                'bg-amber-100 text-amber-700'
                                                             }`}>
                                                             {day.status}
                                                         </span>
@@ -457,8 +457,8 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ userRole, id }) 
                                 <InfoItem icon={Bus} label="Bus Number" value="BUS-204" />
                                 <InfoItem icon={User} label="Driver Name" value="Mr. James Bond" />
                                 <InfoItem icon={Phone} label="Driver Contact" value="+1 (555) 999-0070" />
-                                <InfoItem icon={Clock} label="Pickup Time" value="07:45 AM" />
-                                <InfoItem icon={Clock} label="Drop Time" value="03:30 PM" />
+                                <InfoItem icon={Clock} label="Pickup Time" value="07:30 AM" />
+                                <InfoItem icon={Clock} label="Drop Time" value="11:30 AM" />
                             </div>
                         </Card>
                     )}
@@ -503,7 +503,7 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ userRole, id }) 
                                 <div className="text-center p-4 bg-white/10 rounded-xl border border-white/20">
                                     <p className="text-sm font-medium mb-1 opacity-80">Marked as</p>
                                     <p className={`text-2xl font-bold ${todaysAttendance === 'Present' ? 'text-emerald-300' :
-                                            todaysAttendance === 'Absent' ? 'text-red-300' : 'text-amber-300'
+                                        todaysAttendance === 'Absent' ? 'text-red-300' : 'text-amber-300'
                                         }`}>
                                         {todaysAttendance}
                                     </p>
@@ -529,9 +529,10 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ userRole, id }) 
                         <div className="space-y-4 relative">
                             <div className="absolute left-2 top-0 bottom-0 w-0.5 bg-slate-200"></div>
                             {[
-                                { time: '09:00 AM', subject: 'Mathematics' },
-                                { time: '10:00 AM', subject: 'Physics' },
-                                { time: '11:30 AM', subject: 'Computer Science' },
+                                { time: '08:30 AM', subject: 'Violin Practice' },
+                                { time: '09:00 AM', subject: 'Music Theory' },
+                                { time: '09:30 AM', subject: 'Ensemble Skills' },
+                                { time: '10:00 AM', subject: 'Orchestra Rehearsal' },
                             ].map((slot, i) => (
                                 <div key={i} className="flex gap-4 relative">
                                     <div className="w-4 h-4 rounded-full bg-indigo-600 border-2 border-white absolute left-0 top-1"></div>

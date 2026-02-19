@@ -209,8 +209,8 @@ export const TeacherProfile: React.FC<TeacherProfileProps> = ({ userRole, id }) 
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-all duration-300 font-medium whitespace-nowrap ${activeTab === tab.id
-                                ? 'border-indigo-600 text-indigo-600 bg-indigo-50/50'
-                                : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                            ? 'border-indigo-600 text-indigo-600 bg-indigo-50/50'
+                            : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'
                             }`}
                     >
                         <tab.icon size={18} />
@@ -344,14 +344,14 @@ export const TeacherProfile: React.FC<TeacherProfileProps> = ({ userRole, id }) 
                                             {day === 'Saturday' ? (
                                                 <>
                                                     <div className="flex gap-3 items-center">
-                                                        <span className="px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-md font-mono">09:00 - 10:00</span>
+                                                        <span className="px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-md font-mono">08:30 - 09:30</span>
                                                         <div>
                                                             <p className="text-sm font-bold text-slate-800">Beginner Violin</p>
-                                                            <p className="text-xs text-slate-500">Room 204 • Block A</p>
+                                                            <p className="text-xs text-slate-500">Room 2 Blk A</p>
                                                         </div>
                                                     </div>
                                                     <div className="flex gap-3 items-center">
-                                                        <span className="px-2.5 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-md font-mono">11:00 - 12:30</span>
+                                                        <span className="px-2.5 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-md font-mono">09:30 - 10:30</span>
                                                         <div>
                                                             <p className="text-sm font-bold text-slate-800">Orchestra Practice</p>
                                                             <p className="text-xs text-slate-500">Main Hall</p>
@@ -360,7 +360,7 @@ export const TeacherProfile: React.FC<TeacherProfileProps> = ({ userRole, id }) 
                                                 </>
                                             ) : (
                                                 <div className="flex gap-3 items-center">
-                                                    <span className="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-md font-mono">14:00 - 16:00</span>
+                                                    <span className="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-md font-mono">08:30 - 10:30</span>
                                                     <div>
                                                         <p className="text-sm font-bold text-slate-800">Individual Lessons</p>
                                                         <p className="text-xs text-slate-500">By Appointment</p>
@@ -406,7 +406,7 @@ export const TeacherProfile: React.FC<TeacherProfileProps> = ({ userRole, id }) 
                                     <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Clock size={18} /></div>
                                     <div>
                                         <p className="text-xs text-slate-500 font-medium">Daily Shift</p>
-                                        <p className="text-sm font-bold text-slate-800">08:00 - 16:00</p>
+                                        <p className="text-sm font-bold text-slate-800">08:00 - 11:00</p>
                                     </div>
                                 </div>
                             </div>

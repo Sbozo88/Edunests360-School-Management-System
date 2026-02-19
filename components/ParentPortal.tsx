@@ -285,7 +285,7 @@ export const ParentPortal: React.FC<ParentPortalProps> = ({ onNavigate }) => {
                            </div>
                            <div>
                               <h4 className="text-sm font-bold text-slate-800">PTM Meeting</h4>
-                              <p className="text-xs text-slate-500">Class 10-A • 09:00 AM</p>
+                              <p className="text-xs text-slate-500">Class 10-A • 08:30 AM</p>
                            </div>
                         </div>
                      </div>

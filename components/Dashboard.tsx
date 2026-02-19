@@ -324,10 +324,9 @@ const TeacherDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const myStudentCount = INITIAL_STUDENTS.filter(s => s.status === 'Active').length;
 
   const todaySchedule = [
-    { time: '08:00 – 09:00', class: 'Beginner Violin', room: 'Room A1', students: 12 },
+    { time: '08:30 – 09:30', class: 'Beginner Violin', room: 'Room A1', students: 12 },
     { time: '09:30 – 10:30', class: 'Intermediate Violin', room: 'Room A2', students: 8 },
-    { time: '11:00 – 12:00', class: 'Orchestra Practice', room: 'Hall B', students: 24 },
-    { time: '14:00 – 15:00', class: 'Private Lessons', room: 'Room C3', students: 3 },
+    { time: '08:30 – 10:30', class: 'Orchestra Practice', room: 'Hall B', students: 24 },
   ];
 
   const pendingHomework = [
@@ -425,10 +424,9 @@ const StudentDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const student = INITIAL_STUDENTS[0]; // Mock logged-in student
 
   const todaySchedule = [
-    { time: '08:00 – 09:00', subject: 'Violin Practice', teacher: 'Isaac Molelekwa', room: 'Room A1' },
+    { time: '08:30 – 09:30', subject: 'Violin Practice', teacher: 'Isaac Molelekwa', room: 'Room A1' },
     { time: '09:30 – 10:30', subject: 'Music Theory', teacher: 'Nomonde JPO', room: 'Room B2' },
-    { time: '11:00 – 12:00', subject: 'Orchestra Rehearsal', teacher: 'Vusi Hlatswayo', room: 'Hall B' },
-    { time: '14:00 – 15:00', subject: 'Recorder', teacher: 'Nkuli Shiburi', room: 'Room C1' },
+    { time: '08:30 – 10:30', subject: 'Orchestra Rehearsal', teacher: 'Vusi Hlatswayo', room: 'Hall B' },
   ];
 
   const upcomingExams = [
