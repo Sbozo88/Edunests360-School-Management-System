@@ -16,6 +16,11 @@ import { UserRole, ChartDataPoint } from '../types';
 import { INITIAL_STUDENTS, INITIAL_TEACHERS, INITIAL_STAFF, INITIAL_INVOICES } from '../data';
 import { getGreeting, formatCurrency } from '../locale';
 
+// Custom Rand icon since Lucide doesn't have one
+const RandIcon = ({ size = 22 }: { size?: number }) => (
+  <span style={{ fontSize: size, fontWeight: 800, lineHeight: 1, fontFamily: 'system-ui, sans-serif' }}>R</span>
+);
+
 interface DashboardProps {
   onNavigate: (view: string) => void;
   userRole: UserRole;
@@ -153,7 +158,7 @@ const AdminDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           <StatCard title="Students" value={totalStudents.toString()} trend={12} icon={Users} gradient="from-blue-500 to-cyan-600" bgLight="bg-blue-50" textColor="text-blue-600" onClick={() => onNavigate('student-list')} />
         </div>
         <div className="opacity-0 animate-fade-in-up stagger-3">
-          <StatCard title="Revenue" value={formatCurrency(totalRevenue)} trend={8.2} icon={DollarSign} gradient="from-emerald-500 to-teal-600" bgLight="bg-emerald-50" textColor="text-emerald-600" onClick={() => onNavigate('fees')} />
+          <StatCard title="Revenue" value={formatCurrency(totalRevenue)} trend={8.2} icon={RandIcon} gradient="from-emerald-500 to-teal-600" bgLight="bg-emerald-50" textColor="text-emerald-600" onClick={() => onNavigate('fees')} />
         </div>
         <div className="opacity-0 animate-fade-in-up stagger-4">
           <StatCard title="Teachers" value={totalTeachers.toString()} trend={2.4} icon={GraduationCap} gradient="from-purple-500 to-fuchsia-600" bgLight="bg-purple-50" textColor="text-purple-600" onClick={() => onNavigate('teachers')} />
