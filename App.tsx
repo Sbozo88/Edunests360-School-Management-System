@@ -295,9 +295,9 @@ const App: React.FC = () => {
       case 'fees': return <FeesInvoice userRole={userRole} />;
       case 'expenses': return <ExpenseManager />;
       case 'transport': return <TransportManager userRole={userRole} />;
-      case 'settings': return <SettingsView view="settings" />;
-      case 'reports': return <SettingsView view="reports" />;
-      default: return <Dashboard onNavigate={handleNavigate} />;
+      case 'settings': return <SettingsView view="settings" userRole={userRole} />;
+      case 'reports': return <SettingsView view="reports" userRole={userRole} />;
+      default: return <Dashboard onNavigate={handleNavigate} userRole={userRole} />;
     }
   };
 
