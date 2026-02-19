@@ -7,8 +7,9 @@ import {
   Mic, BookOpen, Headphones, Eraser, Palette, Search, UserPlus,
   Download, Upload, Sun, Moon, Sunrise, Drum
 } from 'lucide-react';
-import { INITIAL_TEACHERS as DATA_TEACHERS, INITIAL_STUDENTS } from '../data';
+import { INITIAL_TEACHERS as DATA_TEACHERS, INITIAL_STUDENTS, INITIAL_CLASSES, INITIAL_ROUTINES } from '../data';
 import { UserRole } from '../types';
+import { getClasses, getRoutines, saveRoutine, deleteRoutine } from '../src/api';
 
 interface AcademicManagerProps {
   view: string;
@@ -132,19 +133,6 @@ const generateInitialRooms = (): Classroom[] => {
 
 const INITIAL_ROOMS: Classroom[] = generateInitialRooms();
 
-const INITIAL_CLASSES: ClassEntity[] = [
-  { id: 'CLS-01', name: 'Violin A', sectionId: 'SEC-01', teacherId: 'TCH-002', roomId: 'RM-2', shift: 'Morning' },
-  { id: 'CLS-02', name: 'Violin B', sectionId: 'SEC-01', teacherId: 'TCH-002', roomId: 'RM-2', shift: 'Morning' },
-  { id: 'CLS-03', name: 'Viola', sectionId: 'SEC-01', teacherId: 'TCH-002', roomId: 'RM-2', shift: 'Day' },
-  { id: 'CLS-04', name: 'Cello', sectionId: 'SEC-01', teacherId: 'TCH-004', roomId: 'RM-1', shift: 'Day' },
-  { id: 'CLS-05', name: 'Flute', sectionId: 'SEC-01', teacherId: 'TCH-001', roomId: 'RM-2', shift: 'Morning' },
-  { id: 'CLS-06', name: 'Clarinet', sectionId: 'SEC-01', teacherId: 'TCH-001', roomId: 'RM-2', shift: 'Morning' },
-  { id: 'CLS-07', name: 'Trumpet', sectionId: 'SEC-01', teacherId: 'TCH-005', roomId: 'RM-1', shift: 'Evening' },
-  { id: 'CLS-08', name: 'Marimba', sectionId: 'SEC-01', teacherId: 'TCH-005', roomId: 'RM-1', shift: 'Evening' },
-  { id: 'CLS-09', name: 'Recorder', sectionId: 'SEC-01', teacherId: 'TCH-1010', roomId: 'RM-4', shift: 'Morning' },
-  { id: 'CLS-10', name: 'Music Theory I', sectionId: 'SEC-03', teacherId: 'TCH-001', roomId: 'RM-1', shift: 'Day' },
-  { id: 'CLS-11', name: 'Contemporary Dance', sectionId: 'SEC-02', teacherId: 'TCH-003', roomId: 'RM-3', shift: 'Evening' },
-];
 
 const INITIAL_SUBJECTS: Subject[] = [
   { id: 'SUB-01', name: 'Violin – Practical Musicianship', classId: 'CLS-01', teacherId: 'TCH-002' },
@@ -152,12 +140,6 @@ const INITIAL_SUBJECTS: Subject[] = [
   { id: 'SUB-03', name: 'Recorder – Practical Musicianship', classId: 'CLS-09', teacherId: 'TCH-1010' },
 ];
 
-const INITIAL_ROUTINES: Routine[] = [
-  { id: 'RT-001', classId: 'CLS-01', day: 'Saturday', timeSlot: '08:30 AM', subjectId: 'SUB-01', studentId: 'STD-001' },
-  { id: 'RT-002', classId: 'CLS-01', day: 'Saturday', timeSlot: '09:00 AM', subjectId: 'SUB-01' },
-  { id: 'RT-003', classId: 'CLS-01', day: 'Saturday', timeSlot: '09:30 AM', subjectId: 'SUB-02' },
-  { id: 'RT-004', classId: 'CLS-01', day: 'Saturday', timeSlot: '10:00 AM', subjectId: 'SUB-01', studentId: 'STD-002' },
-];
 
 // Helper to get icon based on keywords
 const getCategoryIcon = (name: string, size = 20) => {
@@ -187,8 +169,29 @@ export const AcademicManager: React.FC<AcademicManagerProps> = ({ view, userRole
   const [teachers] = useState<Teacher[]>(INITIAL_TEACHERS);
   const [classes, setClasses] = useState<ClassEntity[]>(INITIAL_CLASSES);
   const [subjects, setSubjects] = useState<Subject[]>(INITIAL_SUBJECTS);
-  const [routines, setRoutines] = useState<Routine[]>(INITIAL_ROUTINES);
+  const [routines, setRoutines] = useState<Routine[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      setIsLoading(true);
+      const classesData = await getClasses();
+      const routinesData = await getRoutines();
+      setClasses(classesData);
+      setRoutines(routinesData);
+    } catch (err: any) {
+      console.error("Failed to load academic data:", err);
+      setClasses(INITIAL_CLASSES);
+      setRoutines(INITIAL_ROUTINES);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Editing State
   const [editingClassId, setEditingClassId] = useState<string | null>(null);

@@ -36,3 +36,24 @@ export const INITIAL_INVOICES: Invoice[] = [
   { id: '4', invoiceNo: 'INV-004', studentName: 'Emily Davis', studentId: 'STD-004', amount: 900, status: 'Unpaid', date: '26 Oct 2023', type: 'Library' },
   { id: '5', invoiceNo: 'INV-005', studentName: 'James Wilson', studentId: 'STD-005', amount: 8100, status: 'Paid', date: '24 Oct 2023', type: 'Tuition' },
 ];
+
+export const INITIAL_CLASSES = [
+  { id: 'CLS-01', name: 'Violin A', sectionId: 'SEC-01', teacherId: 'TCH-002', roomId: 'RM-2', shift: 'Morning' },
+  { id: 'CLS-02', name: 'Violin B', sectionId: 'SEC-01', teacherId: 'TCH-002', roomId: 'RM-2', shift: 'Morning' },
+  { id: 'CLS-03', name: 'Viola', sectionId: 'SEC-01', teacherId: 'TCH-002', roomId: 'RM-2', shift: 'Day' },
+  { id: 'CLS-04', name: 'Cello', sectionId: 'SEC-01', teacherId: 'TCH-004', roomId: 'RM-1', shift: 'Day' },
+  { id: 'CLS-05', name: 'Flute', sectionId: 'SEC-01', teacherId: 'TCH-001', roomId: 'RM-2', shift: 'Morning' },
+  { id: 'CLS-06', name: 'Clarinet', sectionId: 'SEC-01', teacherId: 'TCH-001', roomId: 'RM-2', shift: 'Morning' },
+  { id: 'CLS-07', name: 'Trumpet', sectionId: 'SEC-01', teacherId: 'TCH-005', roomId: 'RM-1', shift: 'Evening' },
+  { id: 'CLS-08', name: 'Marimba', sectionId: 'SEC-01', teacherId: 'TCH-005', roomId: 'RM-1', shift: 'Evening' },
+  { id: 'CLS-09', name: 'Recorder', sectionId: 'SEC-01', teacherId: 'TCH-1010', roomId: 'RM-4', shift: 'Morning' },
+  { id: 'CLS-10', name: 'Music Theory I', sectionId: 'SEC-03', teacherId: 'TCH-001', roomId: 'RM-1', shift: 'Day' },
+  { id: 'CLS-11', name: 'Contemporary Dance', sectionId: 'SEC-02', teacherId: 'TCH-003', roomId: 'RM-3', shift: 'Evening' },
+];
+
+export const INITIAL_ROUTINES = [
+  { id: 'RT-001', classId: 'CLS-01', day: 'Saturday', timeSlot: '08:30 AM', subjectId: 'SUB-01', studentId: 'STD-001' },
+  { id: 'RT-002', classId: 'CLS-01', day: 'Saturday', timeSlot: '09:00 AM', subjectId: 'SUB-01' },
+  { id: 'RT-003', classId: 'CLS-01', day: 'Saturday', timeSlot: '09:30 AM', subjectId: 'SUB-02' },
+  { id: 'RT-004', classId: 'CLS-01', day: 'Saturday', timeSlot: '10:00 AM', subjectId: 'SUB-01', studentId: 'STD-002' },
+];

@@ -4,6 +4,7 @@ import { Search, Filter, Eye, Download, Upload, FileSpreadsheet, Trash2, CheckSq
 import { INITIAL_STUDENTS } from '../data';
 import { UserRole } from '../types';
 import { StudentIdCard } from './StudentIdCard';
+import { getStudents, deleteStudent, updateStudent } from '../src/api';
 
 interface StudentListProps {
     onNavigate: (view: string, id?: string) => void;
@@ -17,11 +18,34 @@ interface Student {
     parent: string;
     status: string;
     fee: string;
-    category?: string; // Added category
+    category?: string;
+    attendance?: number;
+    email?: string;
 }
 
 export const StudentList: React.FC<StudentListProps> = ({ onNavigate, userRole }) => {
-    const [students, setStudents] = useState<Student[]>(INITIAL_STUDENTS.map(s => ({ ...s, category: 'General' }))); // Default category
+    const [students, setStudents] = useState<Student[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    React.useEffect(() => {
+        loadStudents();
+    }, []);
+
+    const loadStudents = async () => {
+        try {
+            setIsLoading(true);
+            const data = await getStudents();
+            setStudents(data);
+        } catch (err: any) {
+            console.error("Failed to load students:", err);
+            setError(err.message);
+            // Fallback to mock data if API fails (useful for dev before DB is ready)
+            setStudents(INITIAL_STUDENTS.map(s => ({ ...s, category: 'General' })) as any);
+        } finally {
+            setIsLoading(false);
+        }
+    };
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [currentView, setCurrentView] = useState<'list' | 'categories' | 'promote' | 'disabled'>('list');
     const [viewingIdCard, setViewingIdCard] = useState<string | null>(null);
@@ -58,22 +82,38 @@ export const StudentList: React.FC<StudentListProps> = ({ onNavigate, userRole }
         setSelectedIds(newSelected);
     };
 
-    const applyBulkAction = (action: 'status' | 'fee' | 'delete', value?: string) => {
+    const applyBulkAction = async (action: 'status' | 'fee' | 'delete', value?: string) => {
         if (selectedIds.size === 0) return;
 
-        if (action === 'delete') {
-            if (!window.confirm(`Are you sure you want to delete ${selectedIds.size} students?`)) return;
-            setStudents(prev => prev.filter(s => !selectedIds.has(s.id)));
-        } else {
-            setStudents(prev => prev.map(s => {
-                if (selectedIds.has(s.id)) {
-                    if (action === 'status' && value) return { ...s, status: value };
-                    if (action === 'fee' && value) return { ...s, fee: value };
+        try {
+            if (action === 'delete') {
+                if (!window.confirm(`Are you sure you want to delete ${selectedIds.size} students?`)) return;
+                for (const id of selectedIds) {
+                    await deleteStudent(id);
                 }
-                return s;
-            }));
+                setStudents(prev => prev.filter(s => !selectedIds.has(s.id)));
+            } else {
+                for (const id of selectedIds) {
+                    const student = students.find(s => s.id === id);
+                    if (student) {
+                        const updated = { ...student };
+                        if (action === 'status' && value) updated.status = value;
+                        if (action === 'fee' && value) updated.fee = value;
+                        await updateStudent(id, updated);
+                    }
+                }
+                setStudents(prev => prev.map(s => {
+                    if (selectedIds.has(s.id)) {
+                        if (action === 'status' && value) return { ...s, status: value };
+                        if (action === 'fee' && value) return { ...s, fee: value };
+                    }
+                    return s;
+                }));
+            }
+            setSelectedIds(new Set());
+        } catch (err: any) {
+            alert(`Bulk action failed: ${err.message}`);
         }
-        setSelectedIds(new Set());
     };
 
     // --- Category Logic ---
@@ -91,7 +131,7 @@ export const StudentList: React.FC<StudentListProps> = ({ onNavigate, userRole }
     };
 
     // --- Promote Logic ---
-    const handlePromote = () => {
+    const handlePromote = async () => {
         if (!promoteFrom || !promoteTo) {
             alert("Please select both source and target classes.");
             return;
@@ -102,14 +142,24 @@ export const StudentList: React.FC<StudentListProps> = ({ onNavigate, userRole }
         }
 
         if (window.confirm(`Promote ${selectedIds.size} students from ${promoteFrom} to ${promoteTo}?`)) {
-            setStudents(prev => prev.map(s => {
-                if (selectedIds.has(s.id)) {
-                    return { ...s, class: promoteTo };
+            try {
+                for (const id of selectedIds) {
+                    const student = students.find(s => s.id === id);
+                    if (student) {
+                        await updateStudent(id, { ...student, class: promoteTo });
+                    }
                 }
-                return s;
-            }));
-            setSelectedIds(new Set());
-            alert("Students promoted successfully.");
+                setStudents(prev => prev.map(s => {
+                    if (selectedIds.has(s.id)) {
+                        return { ...s, class: promoteTo };
+                    }
+                    return s;
+                }));
+                setSelectedIds(new Set());
+                alert("Students promoted successfully.");
+            } catch (err: any) {
+                alert(`Promotion failed: ${err.message}`);
+            }
         }
     };
 
@@ -171,10 +221,15 @@ export const StudentList: React.FC<StudentListProps> = ({ onNavigate, userRole }
         fileInputRef.current?.click();
     };
 
-    const handleDelete = (id: string, e: React.MouseEvent) => {
+    const handleDelete = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
         if (window.confirm('Are you sure you want to delete this student record?')) {
-            setStudents(students.filter(s => s.id !== id));
+            try {
+                await deleteStudent(id);
+                setStudents(prev => prev.filter(s => s.id !== id));
+            } catch (err: any) {
+                alert(`Delete failed: ${err.message}`);
+            }
         }
     };
 

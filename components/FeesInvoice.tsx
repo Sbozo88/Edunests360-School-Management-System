@@ -5,6 +5,7 @@ import { formatCurrency } from '../locale';
 import { Download, Eye, Filter, MoreHorizontal, Printer, Search, Trash2, FileText, CheckCircle, Plus, Layers, Settings } from 'lucide-react';
 import { INITIAL_INVOICES } from '../data';
 import { Modal } from './ui/Modal';
+import { getInvoices } from '../src/api';
 
 interface FeesInvoiceProps {
     userRole?: UserRole;
@@ -45,9 +46,33 @@ const INITIAL_FEE_TYPES: FeeType[] = [
 
 export const FeesInvoice: React.FC<FeesInvoiceProps> = ({ userRole }) => {
     const [activeTab, setActiveTab] = useState<'invoices' | 'structure'>('invoices');
-    const [invoices, setInvoices] = useState<Invoice[]>(INITIAL_INVOICES);
+    const [invoices, setInvoices] = useState<Invoice[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [feeTypes, setFeeTypes] = useState<FeeType[]>(INITIAL_FEE_TYPES);
     const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+
+    useEffect(() => {
+        loadInvoices();
+    }, []);
+
+    const loadInvoices = async () => {
+        try {
+            setIsLoading(true);
+            const data = await getInvoices();
+            // Map student_id to studentId for consistency if needed, but the API already follows DB naming
+            // Actually, let's just use the data as is.
+            setInvoices(data.map((inv: any) => ({
+                ...inv,
+                studentId: inv.student_id, // Map DB field to frontend field
+                invoiceNo: inv.id // Using ID as invoice no for now
+            })));
+        } catch (err: any) {
+            console.error("Failed to load invoices:", err);
+            setInvoices(INITIAL_INVOICES);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     // Modal States
     const [showInvoiceModal, setShowInvoiceModal] = useState(false);

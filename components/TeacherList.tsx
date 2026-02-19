@@ -4,6 +4,7 @@ import { Modal } from './ui/Modal';
 import { Search, Filter, Mail, Phone, MoreHorizontal, Plus, Trash2, GraduationCap, Download, Upload, Eye, Edit, CheckSquare, XSquare, X } from 'lucide-react';
 import { INITIAL_TEACHERS } from '../data';
 import { UserRole } from '../types';
+import { getTeachers } from '../src/api';
 
 interface TeacherListProps {
   onNavigate: (view: string, id?: string) => void;
@@ -21,7 +22,26 @@ interface Teacher {
 }
 
 export const TeacherList: React.FC<TeacherListProps> = ({ onNavigate, userRole }) => {
-  const [teachers, setTeachers] = useState<Teacher[]>(INITIAL_TEACHERS as Teacher[]);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadTeachers();
+  }, []);
+
+  const loadTeachers = async () => {
+    try {
+      setIsLoading(true);
+      const data = await getTeachers();
+      setTeachers(data);
+    } catch (err: any) {
+      console.error("Failed to load teachers:", err);
+      setTeachers(INITIAL_TEACHERS as Teacher[]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
