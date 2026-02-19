@@ -1,0 +1,43 @@
+EDUNETS365 - MONOREPO STRUCTURE
+=======================================
+
+root/
+├── apps/
+│   ├── web/                    # Next.js Frontend (App Router)
+│   │   ├── app/                # Pages & Layouts
+│   │   │   ├── (auth)/         # Login/Register Routes
+│   │   │   ├── (dashboard)/    # Protected Routes
+│   │   │   │   ├── admin/      # RBAC specific views
+│   │   │   │   ├── student/
+│   │   │   │   └── teacher/
+│   │   │   └── api/            # Next.js API Routes (Proxy)
+│   │   ├── components/         # React Components
+│   │   │   ├── ui/             # Shadcn/UI primitives
+│   │   │   ├── forms/          # RHF Forms
+│   │   │   └── layouts/        # Dashboard Shell
+│   │   ├── lib/                # Utils, Fetchers
+│   │   └── public/
+│   │
+│   └── api/                    # NestJS Backend API
+│       ├── src/
+│       │   ├── modules/
+│       │   │   ├── auth/
+│       │   │   ├── student/
+│       │   │   ├── academic/
+│       │   │   ├── finance/
+│       │   │   └── chat/       # Socket.io Gateway
+│       │   ├── common/         # Guards, Interceptors
+│       │   └── prisma/         # DB Service
+│       └── test/
+│
+├── packages/                   # Shared workspaces
+│   ├── database/               # Prisma Schema & Client
+│   │   ├── prisma/
+│   │   │   └── schema.prisma
+│   │   └── src/
+│   ├── ui/                     # Shared Design System
+│   └── ts-config/              # Shared TSConfig
+│
+├── turbo.json                  # Turborepo Config
+├── package.json
+└── README.md
