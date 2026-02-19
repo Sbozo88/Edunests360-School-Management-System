@@ -30,9 +30,9 @@ export const INITIAL_STAFF = [
 ];
 
 export const INITIAL_INVOICES: Invoice[] = [
-  { id: '1', invoiceNo: 'INV-001', studentName: 'Alex Morgan', studentId: 'STD-001', amount: 450, status: 'Paid', date: 'Oct 24, 2023', type: 'Tuition' },
-  { id: '2', invoiceNo: 'INV-002', studentName: 'Sarah Smith', studentId: 'STD-002', amount: 120, status: 'Pending', date: 'Oct 25, 2023', type: 'Transport' },
-  { id: '3', invoiceNo: 'INV-003', studentName: 'Michael Johnson', studentId: 'STD-003', amount: 2000, status: 'Overdue', date: 'Sep 01, 2023', type: 'Tuition' },
-  { id: '4', invoiceNo: 'INV-004', studentName: 'Emily Davis', studentId: 'STD-004', amount: 50, status: 'Unpaid', date: 'Oct 26, 2023', type: 'Library' },
-  { id: '5', invoiceNo: 'INV-005', studentName: 'James Wilson', studentId: 'STD-005', amount: 450, status: 'Paid', date: 'Oct 24, 2023', type: 'Tuition' },
+  { id: '1', invoiceNo: 'INV-001', studentName: 'Alex Morgan', studentId: 'STD-001', amount: 8100, status: 'Paid', date: '24 Oct 2023', type: 'Tuition' },
+  { id: '2', invoiceNo: 'INV-002', studentName: 'Sarah Smith', studentId: 'STD-002', amount: 2160, status: 'Pending', date: '25 Oct 2023', type: 'Transport' },
+  { id: '3', invoiceNo: 'INV-003', studentName: 'Michael Johnson', studentId: 'STD-003', amount: 36000, status: 'Overdue', date: '01 Sep 2023', type: 'Tuition' },
+  { id: '4', invoiceNo: 'INV-004', studentName: 'Emily Davis', studentId: 'STD-004', amount: 900, status: 'Unpaid', date: '26 Oct 2023', type: 'Library' },
+  { id: '5', invoiceNo: 'INV-005', studentName: 'James Wilson', studentId: 'STD-005', amount: 8100, status: 'Paid', date: '24 Oct 2023', type: 'Tuition' },
 ];

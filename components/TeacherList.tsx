@@ -21,14 +21,14 @@ interface Teacher {
 }
 
 export const TeacherList: React.FC<TeacherListProps> = ({ onNavigate, userRole }) => {
-  const [teachers, setTeachers] = useState<Teacher[]>(INITIAL_TEACHERS);
+  const [teachers, setTeachers] = useState<Teacher[]>(INITIAL_TEACHERS as Teacher[]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Check if user has write access (Admin/Super Admin)
   const canEdit = userRole === UserRole.SUPER_ADMIN || userRole === UserRole.ADMIN;
 
@@ -38,7 +38,7 @@ export const TeacherList: React.FC<TeacherListProps> = ({ onNavigate, userRole }
     window.addEventListener('click', handleClickOutside);
     return () => window.removeEventListener('click', handleClickOutside);
   }, []);
-  
+
   // Form State
   const [teacherForm, setTeacherForm] = useState({
     name: '',
@@ -48,8 +48,8 @@ export const TeacherList: React.FC<TeacherListProps> = ({ onNavigate, userRole }
     classes: ''
   });
 
-  const filteredTeachers = teachers.filter(t => 
-    t.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  const filteredTeachers = teachers.filter(t =>
+    t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     t.subject.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -74,66 +74,66 @@ export const TeacherList: React.FC<TeacherListProps> = ({ onNavigate, userRole }
 
   const applyBulkAction = (action: 'status' | 'delete', value?: string) => {
     if (selectedIds.size === 0) return;
-    
+
     if (action === 'delete') {
-       if (!window.confirm(`Are you sure you want to delete ${selectedIds.size} teachers?`)) return;
-       setTeachers(prev => prev.filter(t => !selectedIds.has(t.id)));
+      if (!window.confirm(`Are you sure you want to delete ${selectedIds.size} teachers?`)) return;
+      setTeachers(prev => prev.filter(t => !selectedIds.has(t.id)));
     } else {
-       setTeachers(prev => prev.map(t => {
-         if (selectedIds.has(t.id)) {
-           if (action === 'status' && value) return { ...t, status: value as 'Active' | 'On Leave' };
-         }
-         return t;
-       }));
+      setTeachers(prev => prev.map(t => {
+        if (selectedIds.has(t.id)) {
+          if (action === 'status' && value) return { ...t, status: value as 'Active' | 'On Leave' };
+        }
+        return t;
+      }));
     }
     setSelectedIds(new Set());
   };
 
   const handleOpenModal = (teacher?: Teacher) => {
-      if (teacher) {
-          setEditingId(teacher.id);
-          setTeacherForm({
-              name: teacher.name,
-              subject: teacher.subject,
-              email: teacher.email,
-              phone: teacher.phone || '',
-              classes: teacher.classes.join(', ')
-          });
-      } else {
-          setEditingId(null);
-          setTeacherForm({ name: '', subject: '', email: '', phone: '', classes: '' });
-      }
-      setIsModalOpen(true);
-      setActiveMenuId(null);
+    if (teacher) {
+      setEditingId(teacher.id);
+      setTeacherForm({
+        name: teacher.name,
+        subject: teacher.subject,
+        email: teacher.email,
+        phone: teacher.phone || '',
+        classes: teacher.classes.join(', ')
+      });
+    } else {
+      setEditingId(null);
+      setTeacherForm({ name: '', subject: '', email: '', phone: '', classes: '' });
+    }
+    setIsModalOpen(true);
+    setActiveMenuId(null);
   };
 
   const handleSaveTeacher = () => {
     if (!teacherForm.name || !teacherForm.subject) return;
 
     if (editingId) {
-        // Edit existing
-        setTeachers(prev => prev.map(t => t.id === editingId ? {
-            ...t,
-            name: teacherForm.name,
-            subject: teacherForm.subject,
-            email: teacherForm.email,
-            phone: teacherForm.phone,
-            classes: teacherForm.classes ? teacherForm.classes.split(',').map(c => c.trim()) : []
-        } : t));
+      // Edit existing
+      setTeachers(prev => prev.map(t => t.id === editingId ? {
+        ...t,
+        name: teacherForm.name,
+        subject: teacherForm.subject,
+        email: teacherForm.email,
+        phone: teacherForm.phone,
+        classes: teacherForm.classes ? teacherForm.classes.split(',').map(c => c.trim()) : []
+      } : t));
     } else {
-        // Add new
-        const newTeacher: Teacher = {
-            id: `TCH-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
-            name: teacherForm.name,
-            subject: teacherForm.subject,
-            email: teacherForm.email || `${teacherForm.name.toLowerCase().replace(' ', '.')}@school.com`,
-            phone: teacherForm.phone,
-            classes: teacherForm.classes ? teacherForm.classes.split(',').map(c => c.trim()) : [],
-            status: 'Active'
-        };
-        setTeachers([...teachers, newTeacher]);
+      // Add new
+      const newTeacher: Teacher = {
+        id: `TCH-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
+        name: teacherForm.name,
+        subject: teacherForm.subject,
+        email: teacherForm.email || `${teacherForm.name.toLowerCase().replace(' ', '.')}@school.com`,
+        phone: teacherForm.phone,
+        classes: teacherForm.classes ? teacherForm.classes.split(',').map(c => c.trim()) : [],
+        status: 'Active'
+      };
+      setTeachers([...teachers, newTeacher]);
     }
-    
+
     setIsModalOpen(false);
   };
 
@@ -150,7 +150,7 @@ export const TeacherList: React.FC<TeacherListProps> = ({ onNavigate, userRole }
   const handleMenuAction = (e: React.MouseEvent, action: string, teacher: Teacher) => {
     e.stopPropagation();
     setActiveMenuId(null);
-    
+
     if (action === 'view') {
       onNavigate('teacher-profile', teacher.id);
     } else if (action === 'delete') {
@@ -163,7 +163,7 @@ export const TeacherList: React.FC<TeacherListProps> = ({ onNavigate, userRole }
   // --- Bulk Export ---
   const handleExport = () => {
     const headers = ['ID,Name,Subject,Classes,Email,Status'];
-    const rows = teachers.map(t => 
+    const rows = teachers.map(t =>
       `${t.id},${t.name},${t.subject},"${t.classes.join(';')}",${t.email},${t.status}`
     );
     const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].join('\n');
@@ -186,23 +186,23 @@ export const TeacherList: React.FC<TeacherListProps> = ({ onNavigate, userRole }
       const content = e.target?.result as string;
       const lines = content.split('\n');
       const newTeachers: Teacher[] = [];
-      
+
       for (let i = 1; i < lines.length; i++) {
         const line = lines[i].trim();
         if (!line) continue;
-        
+
         const [id, name, subject, classesStr, email, status] = line.split(',');
-        
+
         if (name) {
-             const cleanedClasses = classesStr ? classesStr.replace(/"/g, '').split(';') : [];
-             newTeachers.push({
-                id: id || `TCH-${Date.now() + i}`,
-                name: name.trim(),
-                subject: subject?.trim() || 'General',
-                classes: cleanedClasses,
-                email: email?.trim() || 'N/A',
-                status: (status?.trim() as any) || 'Active'
-             });
+          const cleanedClasses = classesStr ? classesStr.replace(/"/g, '').split(';') : [];
+          newTeachers.push({
+            id: id || `TCH-${Date.now() + i}`,
+            name: name.trim(),
+            subject: subject?.trim() || 'General',
+            classes: cleanedClasses,
+            email: email?.trim() || 'N/A',
+            status: (status?.trim() as any) || 'Active'
+          });
         }
       }
 
@@ -222,37 +222,37 @@ export const TeacherList: React.FC<TeacherListProps> = ({ onNavigate, userRole }
           <h1 className="text-2xl font-bold text-slate-900">Teachers Directory</h1>
           <p className="text-slate-500">Manage teaching faculty and assignments.</p>
         </div>
-        
+
         {/* Actions for Admins Only */}
         {canEdit && (
           <div className="flex flex-wrap gap-2">
-             <button 
-               onClick={handleExport}
-               className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 hover:border-indigo-200 transition-all shadow-sm"
-             >
-               <Download size={18} /> Export
-             </button>
-             
-             <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleImport} 
-                accept=".csv" 
-                className="hidden" 
-             />
-             <button 
-               onClick={() => fileInputRef.current?.click()}
-               className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 hover:border-indigo-200 transition-all shadow-sm"
-             >
-               <Upload size={18} /> Import
-             </button>
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 hover:border-indigo-200 transition-all shadow-sm"
+            >
+              <Download size={18} /> Export
+            </button>
 
-             <button 
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImport}
+              accept=".csv"
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 hover:border-indigo-200 transition-all shadow-sm"
+            >
+              <Upload size={18} /> Import
+            </button>
+
+            <button
               onClick={() => handleOpenModal()}
               className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2"
-             >
-               <Plus size={18} /> Add Teacher
-             </button>
+            >
+              <Plus size={18} /> Add Teacher
+            </button>
           </div>
         )}
       </div>
@@ -274,41 +274,41 @@ export const TeacherList: React.FC<TeacherListProps> = ({ onNavigate, userRole }
       <Card className="p-0 overflow-hidden">
         {/* Toolbar / Bulk Actions */}
         {selectedIds.size > 0 && canEdit ? (
-           <div className="p-4 bg-indigo-50 border-b border-indigo-100 flex flex-col md:flex-row justify-between items-center gap-4 animate-in fade-in slide-in-from-top-2">
-              <div className="flex items-center gap-3">
-                 <span className="bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded-md">{selectedIds.size} Selected</span>
-                 <button onClick={() => setSelectedIds(new Set())} className="text-slate-500 hover:text-slate-700 text-sm flex items-center gap-1">
-                    <X size={14} /> Clear
-                 </button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                 <button onClick={() => applyBulkAction('status', 'Active')} className="flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-md text-sm hover:border-emerald-300 hover:text-emerald-700 shadow-sm">
-                    <CheckSquare size={14} /> Set Active
-                 </button>
-                 <button onClick={() => applyBulkAction('status', 'On Leave')} className="flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-md text-sm hover:border-amber-300 hover:text-amber-700 shadow-sm">
-                    <XSquare size={14} /> Set On Leave
-                 </button>
-                 <button onClick={() => applyBulkAction('delete')} className="flex items-center gap-1 px-3 py-1.5 bg-white border border-red-200 text-red-600 rounded-md text-sm hover:bg-red-50 shadow-sm">
-                    <Trash2 size={14} /> Delete
-                 </button>
-              </div>
-           </div>
-        ) : (
-            <div className="p-5 border-b border-slate-100 flex gap-4">
-                <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input 
-                    type="text" 
-                    placeholder="Search by name, subject, or ID..." 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none"
-                    />
-                </div>
-                <button className="px-4 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 flex items-center gap-2">
-                    <Filter size={18} /> Filter
-                </button>
+          <div className="p-4 bg-indigo-50 border-b border-indigo-100 flex flex-col md:flex-row justify-between items-center gap-4 animate-in fade-in slide-in-from-top-2">
+            <div className="flex items-center gap-3">
+              <span className="bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded-md">{selectedIds.size} Selected</span>
+              <button onClick={() => setSelectedIds(new Set())} className="text-slate-500 hover:text-slate-700 text-sm flex items-center gap-1">
+                <X size={14} /> Clear
+              </button>
             </div>
+            <div className="flex flex-wrap gap-2">
+              <button onClick={() => applyBulkAction('status', 'Active')} className="flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-md text-sm hover:border-emerald-300 hover:text-emerald-700 shadow-sm">
+                <CheckSquare size={14} /> Set Active
+              </button>
+              <button onClick={() => applyBulkAction('status', 'On Leave')} className="flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-md text-sm hover:border-amber-300 hover:text-amber-700 shadow-sm">
+                <XSquare size={14} /> Set On Leave
+              </button>
+              <button onClick={() => applyBulkAction('delete')} className="flex items-center gap-1 px-3 py-1.5 bg-white border border-red-200 text-red-600 rounded-md text-sm hover:bg-red-50 shadow-sm">
+                <Trash2 size={14} /> Delete
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="p-5 border-b border-slate-100 flex gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <input
+                type="text"
+                placeholder="Search by name, subject, or ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none"
+              />
+            </div>
+            <button className="px-4 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 flex items-center gap-2">
+              <Filter size={18} /> Filter
+            </button>
+          </div>
         )}
 
         <div className="overflow-x-auto min-h-[400px]">
@@ -316,14 +316,14 @@ export const TeacherList: React.FC<TeacherListProps> = ({ onNavigate, userRole }
             <thead className="bg-slate-50 text-xs uppercase text-slate-500 font-semibold">
               <tr>
                 <th className="p-4 w-10">
-                    {canEdit && (
-                        <input 
-                            type="checkbox" 
-                            onChange={handleSelectAll} 
-                            checked={selectedIds.size === filteredTeachers.length && filteredTeachers.length > 0}
-                            className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
-                        />
-                    )}
+                  {canEdit && (
+                    <input
+                      type="checkbox"
+                      onChange={handleSelectAll}
+                      checked={selectedIds.size === filteredTeachers.length && filteredTeachers.length > 0}
+                      className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                    />
+                  )}
                 </th>
                 <th className="p-4">Teacher Name</th>
                 <th className="p-4">ID</th>
@@ -336,19 +336,19 @@ export const TeacherList: React.FC<TeacherListProps> = ({ onNavigate, userRole }
             </thead>
             <tbody className="text-sm divide-y divide-slate-100">
               {filteredTeachers.map((teacher) => (
-                <tr 
-                    key={teacher.id} 
-                    onClick={() => handleRowClick(teacher.id)} 
-                    className={`hover:bg-slate-50/50 transition-colors group cursor-pointer relative ${selectedIds.has(teacher.id) ? 'bg-indigo-50/30' : ''}`}
+                <tr
+                  key={teacher.id}
+                  onClick={() => handleRowClick(teacher.id)}
+                  className={`hover:bg-slate-50/50 transition-colors group cursor-pointer relative ${selectedIds.has(teacher.id) ? 'bg-indigo-50/30' : ''}`}
                 >
                   <td className="p-4" onClick={(e) => e.stopPropagation()}>
                     {canEdit && (
-                        <input 
-                            type="checkbox" 
-                            checked={selectedIds.has(teacher.id)}
-                            onChange={() => handleSelectOne(teacher.id)}
-                            className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
-                        />
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(teacher.id)}
+                        onChange={() => handleSelectOne(teacher.id)}
+                        className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                      />
                     )}
                   </td>
                   <td className="p-4 flex items-center gap-3">
@@ -376,54 +376,53 @@ export const TeacherList: React.FC<TeacherListProps> = ({ onNavigate, userRole }
                     </div>
                   </td>
                   <td className="p-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                      teacher.status === 'Active' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-amber-100 text-amber-700 border border-amber-200'
-                    }`}>
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${teacher.status === 'Active' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-amber-100 text-amber-700 border border-amber-200'
+                      }`}>
                       {teacher.status}
                     </span>
                   </td>
                   <td className="p-4 text-right">
                     <div className="flex justify-end gap-2 relative">
-                       {/* More Menu Trigger */}
-                       <div className="relative">
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); setActiveMenuId(activeMenuId === teacher.id ? null : teacher.id); }}
-                            className={`p-2 rounded-lg text-slate-500 transition-colors ${activeMenuId === teacher.id ? 'bg-slate-100 text-slate-800' : 'hover:bg-slate-100'}`}
-                          >
-                             <MoreHorizontal size={18} />
-                          </button>
-                          
-                          {/* Dropdown Menu */}
-                          {activeMenuId === teacher.id && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right">
-                               <div className="py-1">
-                                  <button onClick={(e) => handleMenuAction(e, 'view', teacher)} className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-                                     <Eye size={16} className="text-slate-400" /> View Profile
-                                  </button>
-                                  {canEdit && (
-                                    <>
-                                        <button onClick={(e) => handleMenuAction(e, 'edit', teacher)} className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-                                            <Edit size={16} className="text-slate-400" /> Edit Details
-                                        </button>
-                                        <div className="h-px bg-slate-100 my-1"></div>
-                                        <button onClick={(e) => handleMenuAction(e, 'delete', teacher)} className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
-                                            <Trash2 size={16} /> Delete Teacher
-                                        </button>
-                                    </>
-                                  )}
-                               </div>
-                            </div>
-                          )}
-                       </div>
+                      {/* More Menu Trigger */}
+                      <div className="relative">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setActiveMenuId(activeMenuId === teacher.id ? null : teacher.id); }}
+                          className={`p-2 rounded-lg text-slate-500 transition-colors ${activeMenuId === teacher.id ? 'bg-slate-100 text-slate-800' : 'hover:bg-slate-100'}`}
+                        >
+                          <MoreHorizontal size={18} />
+                        </button>
 
-                       {canEdit && (
-                            <button 
-                                onClick={(e) => { e.stopPropagation(); handleDelete(teacher.id); }}
-                                className="p-2 hover:bg-red-50 hover:text-red-600 rounded-lg text-slate-400 transition-colors"
-                            >
-                                <Trash2 size={18} />
-                            </button>
-                       )}
+                        {/* Dropdown Menu */}
+                        {activeMenuId === teacher.id && (
+                          <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+                            <div className="py-1">
+                              <button onClick={(e) => handleMenuAction(e, 'view', teacher)} className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                                <Eye size={16} className="text-slate-400" /> View Profile
+                              </button>
+                              {canEdit && (
+                                <>
+                                  <button onClick={(e) => handleMenuAction(e, 'edit', teacher)} className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                                    <Edit size={16} className="text-slate-400" /> Edit Details
+                                  </button>
+                                  <div className="h-px bg-slate-100 my-1"></div>
+                                  <button onClick={(e) => handleMenuAction(e, 'delete', teacher)} className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                    <Trash2 size={16} /> Delete Teacher
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {canEdit && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDelete(teacher.id); }}
+                          className="p-2 hover:bg-red-50 hover:text-red-600 rounded-lg text-slate-400 transition-colors"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -440,15 +439,15 @@ export const TeacherList: React.FC<TeacherListProps> = ({ onNavigate, userRole }
         </div>
       </Card>
 
-      <Modal 
+      <Modal
         title={editingId ? "Edit Teacher Details" : "Add New Teacher"}
-        isOpen={isModalOpen} 
+        isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         footer={
           <>
             <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-lg">Cancel</button>
             <button onClick={handleSaveTeacher} className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 shadow-lg shadow-indigo-200">
-                {editingId ? "Save Changes" : "Add Teacher"}
+              {editingId ? "Save Changes" : "Add Teacher"}
             </button>
           </>
         }
@@ -456,53 +455,53 @@ export const TeacherList: React.FC<TeacherListProps> = ({ onNavigate, userRole }
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder="e.g. Mr. John Doe"
               value={teacherForm.name}
-              onChange={(e) => setTeacherForm({...teacherForm, name: e.target.value})}
+              onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })}
               className="w-full p-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Subject Specialization</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder="e.g. Mathematics"
               value={teacherForm.subject}
-              onChange={(e) => setTeacherForm({...teacherForm, subject: e.target.value})}
+              onChange={(e) => setTeacherForm({ ...teacherForm, subject: e.target.value })}
               className="w-full p-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
-              <input 
-                type="email" 
+              <input
+                type="email"
                 placeholder="email@school.com"
                 value={teacherForm.email}
-                onChange={(e) => setTeacherForm({...teacherForm, email: e.target.value})}
+                onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })}
                 className="w-full p-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none"
               />
             </div>
-             <div>
+            <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Phone Number</label>
-              <input 
-                type="tel" 
+              <input
+                type="tel"
                 placeholder="+1 555..."
                 value={teacherForm.phone}
-                onChange={(e) => setTeacherForm({...teacherForm, phone: e.target.value})}
+                onChange={(e) => setTeacherForm({ ...teacherForm, phone: e.target.value })}
                 className="w-full p-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none"
               />
             </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Assigned Classes (comma separated)</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder="e.g. 10-A, 10-B"
               value={teacherForm.classes}
-              onChange={(e) => setTeacherForm({...teacherForm, classes: e.target.value})}
+              onChange={(e) => setTeacherForm({ ...teacherForm, classes: e.target.value })}
               className="w-full p-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none"
             />
           </div>
