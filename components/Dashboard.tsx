@@ -462,7 +462,7 @@ const StudentDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           <StatCard title="Homework Due" value={homeworkDue.filter(h => h.status === 'Pending').length.toString()} icon={ClipboardList} gradient="from-red-500 to-rose-600" bgLight="bg-red-50" textColor="text-red-600" subtext="Needs action" onClick={() => onNavigate('homework')} />
         </div>
         <div className="opacity-0 animate-fade-in-up stagger-4">
-          <StatCard title="Fee Status" value={student.fee} icon={DollarSign} gradient="from-indigo-500 to-violet-600" bgLight="bg-indigo-50" textColor="text-indigo-600" subtext={feeStatus ? formatCurrency(feeStatus.amount) : 'N/A'} />
+          <StatCard title="Fee Status" value={student.fee} icon={RandIcon} gradient="from-indigo-500 to-violet-600" bgLight="bg-indigo-50" textColor="text-indigo-600" subtext={feeStatus ? formatCurrency(feeStatus.amount) : 'N/A'} />
         </div>
       </div>
 

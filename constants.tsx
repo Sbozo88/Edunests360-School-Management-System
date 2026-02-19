@@ -1,6 +1,6 @@
 import React from 'react';
-import { 
-  LayoutDashboard, Users, BookOpen, Calendar, 
+import {
+  LayoutDashboard, Users, BookOpen, Calendar,
   DollarSign, MessageSquare, Bus, Settings,
   Award, FileText, GraduationCap, Briefcase, User,
   CalendarCheck, ClipboardList
@@ -8,11 +8,11 @@ import {
 import { NavItem, UserRole } from './types';
 
 export const SIDEBAR_ITEMS: NavItem[] = [
-  { 
-    label: 'Dashboard', 
-    icon: LayoutDashboard, 
-    id: 'dashboard', 
-    allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT, UserRole.PARENT] 
+  {
+    label: 'Dashboard',
+    icon: LayoutDashboard,
+    id: 'dashboard',
+    allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT, UserRole.PARENT]
   },
   {
     label: 'My Children',
@@ -26,10 +26,10 @@ export const SIDEBAR_ITEMS: NavItem[] = [
     id: 'attendance',
     allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN]
   },
-  { 
-    label: 'Academic', 
-    icon: BookOpen, 
-    id: 'academic', 
+  {
+    label: 'Academic',
+    icon: BookOpen,
+    id: 'academic',
     allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER],
     subItems: [
       { label: 'Classes', id: 'classes', allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER] },
@@ -43,10 +43,10 @@ export const SIDEBAR_ITEMS: NavItem[] = [
     id: 'homework',
     allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT, UserRole.PARENT]
   },
-  { 
-    label: 'Students', 
-    icon: Users, 
-    id: 'students', 
+  {
+    label: 'Students',
+    icon: Users,
+    id: 'students',
     allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER],
     subItems: [
       { label: 'All Students', id: 'student-list', allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER] },
@@ -55,32 +55,32 @@ export const SIDEBAR_ITEMS: NavItem[] = [
     ]
   },
   {
-      label: 'My Profile',
-      icon: Users,
-      id: 'student-profile',
-      allowedRoles: [UserRole.STUDENT]
+    label: 'My Profile',
+    icon: Users,
+    id: 'student-profile',
+    allowedRoles: [UserRole.STUDENT]
   },
-  { 
-    label: 'Teachers', 
-    icon: GraduationCap, 
+  {
+    label: 'Teachers',
+    icon: GraduationCap,
     id: 'teachers',
     allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN]
   },
-  { 
-    label: 'Staff & HR', 
-    icon: Briefcase, 
+  {
+    label: 'Staff & HR',
+    icon: Briefcase,
     id: 'staff',
     allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN]
   },
-  { 
-    label: 'Examinations', 
-    icon: Award, 
+  {
+    label: 'Examinations',
+    icon: Award,
     id: 'exams',
     allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT, UserRole.PARENT]
   },
-  { 
-    label: 'Finance', 
-    icon: DollarSign, 
+  {
+    label: 'Finance',
+    icon: () => <span style={{ fontSize: 18, fontWeight: 800, fontFamily: 'system-ui, sans-serif' }}>R</span>,
     id: 'finance',
     allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.PARENT],
     subItems: [
@@ -88,27 +88,27 @@ export const SIDEBAR_ITEMS: NavItem[] = [
       { label: 'Expenses', id: 'expenses', allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN] }
     ]
   },
-  { 
-    label: 'Transport', 
-    icon: Bus, 
+  {
+    label: 'Transport',
+    icon: Bus,
     id: 'transport',
     allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.PARENT, UserRole.STUDENT]
   },
-  { 
-    label: 'Messages', 
-    icon: MessageSquare, 
+  {
+    label: 'Messages',
+    icon: MessageSquare,
     id: 'messages',
     allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.PARENT, UserRole.STUDENT]
   },
-  { 
-    label: 'Reports', 
-    icon: FileText, 
+  {
+    label: 'Reports',
+    icon: FileText,
     id: 'reports',
     allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN]
   },
-  { 
-    label: 'Settings', 
-    icon: Settings, 
+  {
+    label: 'Settings',
+    icon: Settings,
     id: 'settings',
     allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.PARENT, UserRole.STUDENT]
   },

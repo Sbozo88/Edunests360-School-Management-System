@@ -129,7 +129,7 @@ export const ParentPortal: React.FC<ParentPortalProps> = ({ onNavigate }) => {
                      </Card>
                      <Card className="bg-amber-50 border-amber-100 hover:shadow-md transition-shadow">
                         <div className="flex flex-col">
-                           <span className="text-xs font-bold text-amber-600 uppercase mb-1 flex items-center gap-1"><DollarSign size={12} /> Fee Due</span>
+                           <span className="text-xs font-bold text-amber-600 uppercase mb-1 flex items-center gap-1"><span style={{ fontWeight: 800 }}>R</span> Fee Due</span>
                            <span className="text-2xl font-bold text-slate-800">{formatCurrency(totalDue)}</span>
                            <span className="text-[10px] text-amber-600/70 font-medium mt-1">Pay by 30th</span>
                         </div>
@@ -179,7 +179,7 @@ export const ParentPortal: React.FC<ParentPortalProps> = ({ onNavigate }) => {
                               <div key={inv.id} className="flex items-center justify-between p-3 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors">
                                  <div className="flex items-center gap-3">
                                     <div className={`p-2 rounded-lg ${inv.status === 'Paid' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>
-                                       <DollarSign size={20} />
+                                       <span style={{ fontSize: 20, fontWeight: 800, fontFamily: 'system-ui, sans-serif' }}>R</span>
                                     </div>
                                     <div>
                                        <p className="font-bold text-slate-800">{inv.type} Fee</p>
