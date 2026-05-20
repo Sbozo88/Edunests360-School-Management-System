@@ -9,8 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@netlify/database": "^1.0.0",
     "@netlify/functions": "^5.1.2",
-    "@netlify/neon": "^0.1.2",
+    "drizzle-orm": "^1.0.0-beta.22",
     "lucide-react": "^0.460.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -21,6 +22,7 @@
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
     "@vitejs/plugin-react": "^4.2.1",
+    "drizzle-kit": "^1.0.0-beta.22",
     "typescript": "^5.2.2",
     "vite": "^5.1.6"
   }

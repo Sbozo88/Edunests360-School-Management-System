@@ -7,7 +7,17 @@ export default async (req: Request, context: Context) => {
 
     try {
         if (method === 'GET') {
-            const classes = await db`SELECT * FROM classes ORDER BY name ASC`;
+            const classes = await db`
+                SELECT
+                    id,
+                    name,
+                    section_id AS "sectionId",
+                    teacher_id AS "teacherId",
+                    room_id AS "roomId",
+                    shift
+                FROM classes
+                ORDER BY name ASC
+            `;
             return new Response(JSON.stringify(classes), {
                 headers: { "Content-Type": "application/json" }
             });

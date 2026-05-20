@@ -1,6 +1,12 @@
-import { neon } from '@netlify/neon';
+import { getDatabase, MissingDatabaseConnectionError } from '@netlify/database';
 
 export const getDb = () => {
-    const sql = neon(process.env.DATABASE_URL!);
-    return sql;
+    try {
+        return getDatabase().sql;
+    } catch (error) {
+        if (error instanceof MissingDatabaseConnectionError) {
+            throw new Error('Database connection is not configured. Enable Netlify Database for this project.');
+        }
+        throw error;
+    }
 };

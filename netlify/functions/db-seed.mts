@@ -17,6 +17,7 @@ export default async (req: Request, context: Context) => {
             email TEXT NOT NULL,
             status TEXT DEFAULT 'Active',
             attendance INTEGER DEFAULT 0,
+            fee TEXT DEFAULT 'Pending',
             avatar TEXT,
             created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
           );
@@ -77,8 +78,8 @@ export default async (req: Request, context: Context) => {
             const section = classParts[1] || 'A';
 
             await db`
-        INSERT INTO students (id, name, class, section, parent, email, status, attendance)
-        VALUES (${s.id}, ${s.name}, ${className}, ${section}, ${s.parent}, ${s.email}, ${s.status}, ${s.attendance})
+        INSERT INTO students (id, name, class, section, parent, email, status, attendance, fee)
+        VALUES (${s.id}, ${s.name}, ${className}, ${section}, ${s.parent}, ${s.email}, ${s.status}, ${s.attendance}, ${s.fee})
         ON CONFLICT (id) DO UPDATE SET
           name = EXCLUDED.name,
           class = EXCLUDED.class,
@@ -86,7 +87,8 @@ export default async (req: Request, context: Context) => {
           parent = EXCLUDED.parent,
           email = EXCLUDED.email,
           status = EXCLUDED.status,
-          attendance = EXCLUDED.attendance
+          attendance = EXCLUDED.attendance,
+          fee = EXCLUDED.fee
       `;
         }
 

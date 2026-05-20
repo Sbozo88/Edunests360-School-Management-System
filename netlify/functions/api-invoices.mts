@@ -7,7 +7,20 @@ export default async (req: Request, context: Context) => {
 
     try {
         if (method === 'GET') {
-            const invoices = await db`SELECT * FROM invoices ORDER BY date DESC`;
+            const invoices = await db`
+                SELECT
+                    invoices.id,
+                    invoices.id AS "invoiceNo",
+                    invoices.student_id AS "studentId",
+                    COALESCE(students.name, invoices.student_id, 'Unknown student') AS "studentName",
+                    invoices.description AS type,
+                    invoices.amount::float AS amount,
+                    invoices.status,
+                    invoices.date
+                FROM invoices
+                LEFT JOIN students ON students.id = invoices.student_id
+                ORDER BY invoices.created_at DESC
+            `;
             return new Response(JSON.stringify(invoices), {
                 headers: { "Content-Type": "application/json" }
             });

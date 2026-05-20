@@ -17,7 +17,11 @@ export default async (req: Request, context: Context) => {
                     status: student[0] ? 200 : 404
                 });
             }
-            const students = await db`SELECT * FROM students ORDER BY created_at DESC`;
+            const students = await db`
+                SELECT id, name, class, section, parent, email, status, attendance, avatar, fee
+                FROM students
+                ORDER BY created_at DESC
+            `;
             return new Response(JSON.stringify(students), {
                 headers: { "Content-Type": "application/json" }
             });
@@ -25,21 +29,21 @@ export default async (req: Request, context: Context) => {
 
         if (method === 'POST') {
             const data = await req.json();
-            const { id, name, class: className, section, parent, email, status, attendance, avatar } = data;
+            const { id, name, class: className, section, parent, email, status, attendance, avatar, fee } = data;
             await db`
-        INSERT INTO students (id, name, class, section, parent, email, status, attendance, avatar)
-        VALUES (${id}, ${name}, ${className}, ${section}, ${parent}, ${email}, ${status}, ${attendance}, ${avatar})
+        INSERT INTO students (id, name, class, section, parent, email, status, attendance, avatar, fee)
+        VALUES (${id}, ${name}, ${className}, ${section}, ${parent}, ${email}, ${status}, ${attendance}, ${avatar}, ${fee})
       `;
             return new Response(JSON.stringify({ success: true }), { status: 201 });
         }
 
         if (method === 'PUT' && id) {
             const data = await req.json();
-            const { name, class: className, section, parent, email, status, attendance, avatar } = data;
+            const { name, class: className, section, parent, email, status, attendance, avatar, fee } = data;
             await db`
         UPDATE students
         SET name = ${name}, class = ${className}, section = ${section}, parent = ${parent}, 
-            email = ${email}, status = ${status}, attendance = ${attendance}, avatar = ${avatar}
+            email = ${email}, status = ${status}, attendance = ${attendance}, avatar = ${avatar}, fee = ${fee}
         WHERE id = ${id}
       `;
             return new Response(JSON.stringify({ success: true }));

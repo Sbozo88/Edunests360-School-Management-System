@@ -10,8 +10,29 @@ export default async (req: Request, context: Context) => {
     try {
         if (method === 'GET') {
             const routines = classId
-                ? await db`SELECT * FROM routines WHERE class_id = ${classId} ORDER BY time_slot ASC`
-                : await db`SELECT * FROM routines ORDER BY time_slot ASC`;
+                ? await db`
+                    SELECT
+                        id,
+                        class_id AS "classId",
+                        day,
+                        time_slot AS "timeSlot",
+                        subject_id AS "subjectId",
+                        student_id AS "studentId"
+                    FROM routines
+                    WHERE class_id = ${classId}
+                    ORDER BY time_slot ASC
+                `
+                : await db`
+                    SELECT
+                        id,
+                        class_id AS "classId",
+                        day,
+                        time_slot AS "timeSlot",
+                        subject_id AS "subjectId",
+                        student_id AS "studentId"
+                    FROM routines
+                    ORDER BY time_slot ASC
+                `;
             return new Response(JSON.stringify(routines), {
                 headers: { "Content-Type": "application/json" }
             });
