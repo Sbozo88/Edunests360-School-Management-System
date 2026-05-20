@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { Card } from './ui/Card';
 import { Search, Filter, Eye, Download, Upload, FileSpreadsheet, Trash2, CheckSquare, XSquare, DollarSign, X, Layers, ArrowRight, UserX, UserCheck, CreditCard } from 'lucide-react';
-import { INITIAL_STUDENTS } from '../data';
+import { INITIAL_STUDENTS, INITIAL_CLASSES } from '../data';
 import { UserRole } from '../types';
 import { StudentIdCard } from './StudentIdCard';
 import { getStudents, deleteStudent, updateStudent } from '../src/api';
@@ -27,32 +27,82 @@ export const StudentList: React.FC<StudentListProps> = ({ onNavigate, userRole }
     const [students, setStudents] = useState<Student[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    
+    // Pagination & Filter States
+    const [page, setPage] = useState(1);
+    const [limit] = useState(20);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [search, setSearch] = useState('');
+    const [selectedClass, setSelectedClass] = useState('');
+    const [selectedGrade, setSelectedGrade] = useState('');
+    const [selectedFee, setSelectedFee] = useState('');
+    const [showFilters, setShowFilters] = useState(false);
+    const [currentView, setCurrentView] = useState<'list' | 'categories' | 'promote' | 'disabled'>('list');
 
+    // Debounce search input
+    React.useEffect(() => {
+        const timer = setTimeout(() => {
+            setSearch(searchTerm);
+            setPage(1);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    // Active classes based on selected grade
+    const classesForGrade = useMemo(() => {
+        if (!selectedGrade) return INITIAL_CLASSES.map(c => c.name).sort();
+        return INITIAL_CLASSES
+            .filter(c => c.name.startsWith(selectedGrade))
+            .map(c => c.name)
+            .sort();
+    }, [selectedGrade]);
+
+    // Reload students on any param change
     React.useEffect(() => {
         loadStudents();
-    }, []);
+    }, [page, search, selectedClass, selectedGrade, selectedFee, currentView]);
 
     const loadStudents = async () => {
         try {
             setIsLoading(true);
-            const data = await getStudents();
-            setStudents(data);
+            const statusParam = currentView === 'disabled' ? 'Inactive' : (currentView === 'list' ? 'Active' : undefined);
+            
+            const data = await getStudents({
+                page,
+                limit,
+                search,
+                class: selectedClass,
+                grade: selectedGrade,
+                status: statusParam,
+                fee: selectedFee
+            });
+
+            if (data && data.students) {
+                setStudents(data.students.map((s: any) => ({ ...s, category: s.category || 'General' })));
+                setTotalPages(data.pagination.totalPages || 1);
+                setTotalCount(data.pagination.total || 0);
+            } else {
+                setStudents([]);
+            }
         } catch (err: any) {
             console.error("Failed to load students:", err);
             setError(err.message);
-            // Fallback to mock data if API fails (useful for dev before DB is ready)
+            // Fallback to mock data if API fails
             setStudents(INITIAL_STUDENTS.map(s => ({ ...s, category: 'General' })) as any);
         } finally {
             setIsLoading(false);
         }
     };
+
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-    const [currentView, setCurrentView] = useState<'list' | 'categories' | 'promote' | 'disabled'>('list');
     const [viewingIdCard, setViewingIdCard] = useState<string | null>(null);
 
     // Category State
     const [categories, setCategories] = useState(['General', 'Scholarship', 'Sports Quota', 'Staff Child']);
     const [newCategory, setNewCategory] = useState('');
+
 
     // Promote State
     const [promoteFrom, setPromoteFrom] = useState('');
@@ -338,6 +388,97 @@ export const StudentList: React.FC<StudentListProps> = ({ onNavigate, userRole }
         </div>
     );
 
+    const renderPagination = () => {
+        if (totalPages <= 1) return null;
+
+        const pages = [];
+        let startPage = Math.max(1, page - 2);
+        let endPage = Math.min(totalPages, page + 2);
+        if (endPage - startPage < 4) {
+            if (startPage === 1) {
+                endPage = Math.min(totalPages, 5);
+            } else if (endPage === totalPages) {
+                startPage = Math.max(1, totalPages - 4);
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
+        }
+
+        return (
+            <div className="p-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50/50">
+                <span className="text-xs text-slate-500 font-medium order-2 sm:order-1">
+                    Showing <strong className="text-slate-700">{(page - 1) * limit + 1}</strong> to{" "}
+                    <strong className="text-slate-700">
+                        {Math.min(page * limit, totalCount)}
+                    </strong>{" "}
+                    of <strong className="text-slate-700">{totalCount}</strong> learners
+                </span>
+                
+                <div className="flex gap-1.5 order-1 sm:order-2">
+                    <button
+                        onClick={() => setPage(prev => Math.max(1, prev - 1))}
+                        disabled={page === 1}
+                        className="px-3 py-1.5 border border-slate-200 rounded-xl bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-semibold shadow-sm transition-all"
+                    >
+                        Prev
+                    </button>
+                    {startPage > 1 && (
+                        <>
+                            <button
+                                onClick={() => setPage(1)}
+                                className={`px-3 py-1.5 border rounded-xl text-xs font-semibold shadow-sm transition-all ${
+                                    page === 1
+                                        ? "bg-indigo-600 border-indigo-600 text-white"
+                                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                                }`}
+                            >
+                                1
+                            </button>
+                            {startPage > 2 && <span className="text-slate-400 px-1 self-center text-xs">...</span>}
+                        </>
+                    )}
+                    {pages.map(p => (
+                        <button
+                            key={p}
+                            onClick={() => setPage(p)}
+                            className={`px-3 py-1.5 border rounded-xl text-xs font-semibold shadow-sm transition-all ${
+                                page === p
+                                    ? "bg-indigo-600 border-indigo-600 text-white shadow-indigo-100"
+                                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                            }`}
+                        >
+                            {p}
+                        </button>
+                    ))}
+                    {endPage < totalPages && (
+                        <>
+                            {endPage < totalPages - 1 && <span className="text-slate-400 px-1 self-center text-xs">...</span>}
+                            <button
+                                onClick={() => setPage(totalPages)}
+                                className={`px-3 py-1.5 border rounded-xl text-xs font-semibold shadow-sm transition-all ${
+                                    page === totalPages
+                                        ? "bg-indigo-600 border-indigo-600 text-white"
+                                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                                }`}
+                            >
+                                {totalPages}
+                            </button>
+                        </>
+                    )}
+                    <button
+                        onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={page === totalPages}
+                        className="px-3 py-1.5 border border-slate-200 rounded-xl bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-semibold shadow-sm transition-all"
+                    >
+                        Next
+                    </button>
+                </div>
+            </div>
+        );
+    };
+
     const studentForIdCard = viewingIdCard ? students.find(s => s.id === viewingIdCard) : null;
 
     return (
@@ -396,15 +537,84 @@ export const StudentList: React.FC<StudentListProps> = ({ onNavigate, userRole }
                                 </div>
                             </div>
                         ) : (
-                            <div className="p-4 border-b border-slate-100 flex gap-3">
-                                <div className="relative flex-1">
-                                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                                    <input type="text" placeholder="Search by name, roll no, or parent..." className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm input-premium outline-none" />
+                            <div>
+                                <div className="p-4 border-b border-slate-100 flex gap-3">
+                                    <div className="relative flex-1">
+                                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                        <input
+                                            type="text"
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            placeholder="Search by name, roll no, parent or email..."
+                                            className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm input-premium outline-none"
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={() => setShowFilters(!showFilters)}
+                                        className={`px-4 py-2.5 border rounded-xl flex items-center gap-2 text-sm font-medium transition-all ${showFilters ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'}`}
+                                    >
+                                        <Filter size={16} /> Filter
+                                    </button>
                                 </div>
-                                <button className="px-4 py-2.5 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 hover:border-slate-300 flex items-center gap-2 text-sm font-medium transition-all"><Filter size={16} /> Filter</button>
+                                {showFilters && (
+                                    <div className="p-4 bg-slate-50/50 border-b border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-3 animate-in fade-in duration-200">
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Grade</label>
+                                            <select
+                                                value={selectedGrade}
+                                                onChange={(e) => { setSelectedGrade(e.target.value); setSelectedClass(''); setPage(1); }}
+                                                className="w-full p-2 border border-slate-200 rounded-xl text-xs bg-white outline-none focus:ring-2 focus:ring-indigo-100 text-slate-700 font-semibold"
+                                            >
+                                                <option value="">All Grades</option>
+                                                <option value="R">Grade R</option>
+                                                <option value="1">Grade 1</option>
+                                                <option value="2">Grade 2</option>
+                                                <option value="3">Grade 3</option>
+                                                <option value="4">Grade 4</option>
+                                                <option value="5">Grade 5</option>
+                                                <option value="6">Grade 6</option>
+                                                <option value="7">Grade 7</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Class</label>
+                                            <select
+                                                value={selectedClass}
+                                                onChange={(e) => { setSelectedClass(e.target.value); setPage(1); }}
+                                                className="w-full p-2 border border-slate-200 rounded-xl text-xs bg-white outline-none focus:ring-2 focus:ring-indigo-100 text-slate-700 font-semibold"
+                                            >
+                                                <option value="">All Classes</option>
+                                                {classesForGrade.map(c => <option key={c} value={c}>Class {c}</option>)}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Fee Status</label>
+                                            <select
+                                                value={selectedFee}
+                                                onChange={(e) => { setSelectedFee(e.target.value); setPage(1); }}
+                                                className="w-full p-2 border border-slate-200 rounded-xl text-xs bg-white outline-none focus:ring-2 focus:ring-indigo-100 text-slate-700 font-semibold"
+                                            >
+                                                <option value="">All Fee Statuses</option>
+                                                <option value="Paid">Paid</option>
+                                                <option value="Pending">Pending</option>
+                                                <option value="Overdue">Overdue</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
-                        {renderStudentTable(students.filter(s => s.status !== 'Inactive'))}
+                        {isLoading ? (
+                            <div className="p-16 flex flex-col items-center justify-center gap-4 text-slate-400">
+                                <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+                                <span className="text-sm font-medium">Loading learners...</span>
+                            </div>
+                        ) : (
+                            <>
+                                {renderStudentTable(students)}
+                                {renderPagination()}
+                            </>
+                        )}
                     </>
                 )}
 
@@ -415,7 +625,17 @@ export const StudentList: React.FC<StudentListProps> = ({ onNavigate, userRole }
                             <h3 className="text-red-700 font-bold flex items-center gap-2"><UserX size={20} /> Disabled / Inactive Students</h3>
                             <p className="text-sm text-slate-500">Students listed here are inactive and have limited access.</p>
                         </div>
-                        {renderStudentTable(students.filter(s => s.status === 'Inactive'))}
+                        {isLoading ? (
+                            <div className="p-16 flex flex-col items-center justify-center gap-4 text-slate-400">
+                                <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+                                <span className="text-sm font-medium">Loading inactive learners...</span>
+                            </div>
+                        ) : (
+                            <>
+                                {renderStudentTable(students)}
+                                {renderPagination()}
+                            </>
+                        )}
                     </>
                 )}
 

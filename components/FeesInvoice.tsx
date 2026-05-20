@@ -51,24 +51,60 @@ export const FeesInvoice: React.FC<FeesInvoiceProps> = ({ userRole }) => {
     const [feeTypes, setFeeTypes] = useState<FeeType[]>(INITIAL_FEE_TYPES);
     const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
 
+    // Server-side Pagination & Filter States
+    const [page, setPage] = useState(1);
+    const [limit] = useState(20);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [search, setSearch] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
+    const [showFilters, setShowFilters] = useState(false);
+
+    // Debounce search input
     useEffect(() => {
-        loadInvoices();
-    }, []);
+        const timer = setTimeout(() => {
+            setSearch(searchTerm);
+            setPage(1);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        if (activeTab === 'invoices') {
+            loadInvoices();
+        }
+    }, [page, search, statusFilter, activeTab]);
 
     const loadInvoices = async () => {
         try {
             setIsLoading(true);
-            const data = await getInvoices();
-            // Map student_id to studentId for consistency if needed, but the API already follows DB naming
-            // Actually, let's just use the data as is.
-            setInvoices(data.map((inv: any) => ({
-                ...inv,
-                studentId: inv.studentId ?? inv.student_id,
-                invoiceNo: inv.invoiceNo ?? inv.id
-            })));
+            const data = await getInvoices({
+                page,
+                limit,
+                search,
+                status: statusFilter || undefined
+            });
+            
+            if (data && data.invoices) {
+                setInvoices(data.invoices.map((inv: any) => ({
+                    ...inv,
+                    studentId: inv.studentId ?? inv.student_id,
+                    invoiceNo: inv.invoiceNo ?? inv.id
+                })));
+                setTotalPages(data.pagination?.totalPages || 1);
+                setTotalCount(data.pagination?.total || 0);
+            } else {
+                setInvoices([]);
+                setTotalPages(1);
+                setTotalCount(0);
+            }
         } catch (err: any) {
             console.error("Failed to load invoices:", err);
+            // Fallback to mock data on error
             setInvoices(INITIAL_INVOICES);
+            setTotalPages(1);
+            setTotalCount(INITIAL_INVOICES.length);
         } finally {
             setIsLoading(false);
         }
@@ -122,6 +158,21 @@ export const FeesInvoice: React.FC<FeesInvoiceProps> = ({ userRole }) => {
         else if (action === 'view') alert(`Viewing details for invoice ${id}...`);
     };
 
+    const handleExport = () => {
+        const headers = ['Invoice No,Student,Student ID,Type,Amount,Date,Status'];
+        const rows = invoices.map(inv =>
+            `"${inv.id}","${inv.studentName}","${inv.studentId}","${inv.type}",${inv.amount},"${inv.date}","${inv.status}"`
+        );
+        const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].join('\n');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "invoices_export.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex flex-col md:flex-row justify-between items-end md:items-center gap-4">
@@ -168,106 +219,231 @@ export const FeesInvoice: React.FC<FeesInvoiceProps> = ({ userRole }) => {
                             <input
                                 type="text"
                                 placeholder="Search invoice..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
                                 className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:border-indigo-500 outline-none text-sm"
                             />
                         </div>
                         <div className="flex gap-2">
-                            <button className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50">
+                            <button
+                                onClick={() => setShowFilters(!showFilters)}
+                                className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm font-medium transition-all ${
+                                    showFilters
+                                        ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
+                                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
                                 <Filter size={16} /> Filter
                             </button>
-                            <button className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50">
+                            <button
+                                onClick={handleExport}
+                                className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50"
+                            >
                                 <Download size={16} /> Export
                             </button>
                         </div>
                     </div>
 
+                    {showFilters && (
+                        <div className="p-4 bg-slate-50/50 border-b border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-3 animate-in fade-in duration-200">
+                            <div>
+                                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Status</label>
+                                <select
+                                    value={statusFilter}
+                                    onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+                                    className="w-full p-2 border border-slate-200 rounded-xl text-xs bg-white outline-none focus:ring-2 focus:ring-indigo-100 text-slate-700 font-semibold"
+                                >
+                                    <option value="">All Statuses</option>
+                                    <option value="Paid">Paid</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Overdue">Overdue</option>
+                                </select>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Table */}
                     <div className="overflow-x-auto min-h-[400px]">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-slate-50 border-b border-slate-100 text-xs uppercase tracking-wider text-slate-500 font-semibold">
-                                    <th className="p-4"><input type="checkbox" className="rounded border-slate-300" /></th>
-                                    <th className="p-4">Invoice No</th>
-                                    <th className="p-4">Student</th>
-                                    <th className="p-4">Type</th>
-                                    <th className="p-4">Amount</th>
-                                    <th className="p-4">Date</th>
-                                    <th className="p-4">Status</th>
-                                    <th className="p-4 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="text-sm">
-                                {invoices.map((invoice) => (
-                                    <tr key={invoice.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors group relative">
-                                        <td className="p-4"><input type="checkbox" className="rounded border-slate-300" /></td>
-                                        <td className="p-4 font-medium text-indigo-600">{invoice.invoiceNo}</td>
-                                        <td className="p-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
-                                                    {invoice.studentName.charAt(0)}
-                                                </div>
-                                                <div>
-                                                    <p className="font-medium text-slate-800">{invoice.studentName}</p>
-                                                    <p className="text-xs text-slate-400">{invoice.studentId}</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="p-4 text-slate-600">{invoice.type}</td>
-                                        <td className="p-4 font-semibold text-slate-800">{formatCurrency(invoice.amount)}</td>
-                                        <td className="p-4 text-slate-500">{invoice.date}</td>
-                                        <td className="p-4"><StatusBadge status={invoice.status} /></td>
-                                        <td className="p-4">
-                                            <div className="flex justify-end gap-2 opacity-100 transition-opacity">
-                                                <button className="p-1.5 hover:bg-indigo-50 text-indigo-600 rounded"><Eye size={16} /></button>
-                                                <button className="p-1.5 hover:bg-slate-100 text-slate-600 rounded"><Printer size={16} /></button>
-
-                                                {/* More Menu */}
-                                                <div className="relative">
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); setActiveMenuId(activeMenuId === invoice.id ? null : invoice.id); }}
-                                                        className={`p-1.5 rounded transition-colors ${activeMenuId === invoice.id ? 'bg-slate-100 text-slate-800' : 'hover:bg-slate-100 text-slate-600'}`}
-                                                    >
-                                                        <MoreHorizontal size={16} />
-                                                    </button>
-
-                                                    {activeMenuId === invoice.id && (
-                                                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right">
-                                                            <div className="py-1">
-                                                                <button onClick={(e) => handleMenuAction(e, 'view', invoice.id)} className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-                                                                    <FileText size={16} className="text-slate-400" /> View Details
-                                                                </button>
-                                                                <button onClick={(e) => handleMenuAction(e, 'download', invoice.id)} className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-                                                                    <Download size={16} className="text-slate-400" /> Download PDF
-                                                                </button>
-                                                                {canEdit && (
-                                                                    <>
-                                                                        <div className="h-px bg-slate-100 my-1"></div>
-                                                                        <button onClick={(e) => handleMenuAction(e, 'delete', invoice.id)} className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
-                                                                            <Trash2 size={16} /> Delete Invoice
-                                                                        </button>
-                                                                    </>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </td>
+                        {isLoading ? (
+                            <div className="p-16 flex flex-col items-center justify-center gap-4 text-slate-400">
+                                <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+                                <span className="text-sm font-medium">Loading invoices...</span>
+                            </div>
+                        ) : invoices.length === 0 ? (
+                            <div className="p-16 flex flex-col items-center justify-center gap-4 text-slate-400">
+                                <FileText size={32} className="text-slate-300" />
+                                <span className="text-sm font-medium">No invoices found</span>
+                            </div>
+                        ) : (
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-slate-50 border-b border-slate-100 text-xs uppercase tracking-wider text-slate-500 font-semibold">
+                                        <th className="p-4"><input type="checkbox" className="rounded border-slate-300" /></th>
+                                        <th className="p-4">Invoice No</th>
+                                        <th className="p-4">Student</th>
+                                        <th className="p-4">Type</th>
+                                        <th className="p-4">Amount</th>
+                                        <th className="p-4">Date</th>
+                                        <th className="p-4">Status</th>
+                                        <th className="p-4 text-right">Actions</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="text-sm">
+                                    {invoices.map((invoice) => (
+                                        <tr key={invoice.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors group relative">
+                                            <td className="p-4"><input type="checkbox" className="rounded border-slate-300" /></td>
+                                            <td className="p-4 font-medium text-indigo-600">{invoice.invoiceNo}</td>
+                                            <td className="p-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
+                                                        {invoice.studentName.charAt(0)}
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-medium text-slate-800">{invoice.studentName}</p>
+                                                        <p className="text-xs text-slate-400">{invoice.studentId}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="p-4 text-slate-600">{invoice.type}</td>
+                                            <td className="p-4 font-semibold text-slate-800">{formatCurrency(invoice.amount)}</td>
+                                            <td className="p-4 text-slate-500">{invoice.date}</td>
+                                            <td className="p-4"><StatusBadge status={invoice.status} /></td>
+                                            <td className="p-4">
+                                                <div className="flex justify-end gap-2 opacity-100 transition-opacity">
+                                                    <button className="p-1.5 hover:bg-indigo-50 text-indigo-600 rounded"><Eye size={16} /></button>
+                                                    <button className="p-1.5 hover:bg-slate-100 text-slate-600 rounded"><Printer size={16} /></button>
+
+                                                    {/* More Menu */}
+                                                    <div className="relative">
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); setActiveMenuId(activeMenuId === invoice.id ? null : invoice.id); }}
+                                                            className={`p-1.5 rounded transition-colors ${activeMenuId === invoice.id ? 'bg-slate-100 text-slate-800' : 'hover:bg-slate-100 text-slate-600'}`}
+                                                        >
+                                                            <MoreHorizontal size={16} />
+                                                        </button>
+
+                                                        {activeMenuId === invoice.id && (
+                                                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+                                                                <div className="py-1">
+                                                                    <button onClick={(e) => handleMenuAction(e, 'view', invoice.id)} className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                                                                        <FileText size={16} className="text-slate-400" /> View Details
+                                                                    </button>
+                                                                    <button onClick={(e) => handleMenuAction(e, 'download', invoice.id)} className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                                                                        <Download size={16} className="text-slate-400" /> Download PDF
+                                                                    </button>
+                                                                    {canEdit && (
+                                                                        <>
+                                                                            <div className="h-px bg-slate-100 my-1"></div>
+                                                                            <button onClick={(e) => handleMenuAction(e, 'delete', invoice.id)} className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                                                                <Trash2 size={16} /> Delete Invoice
+                                                                            </button>
+                                                                        </>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
                     </div>
 
                     {/* Pagination */}
-                    <div className="p-4 border-t border-slate-100 flex justify-between items-center text-sm text-slate-500">
-                        <p>Showing 1 to {invoices.length} of {invoices.length} entries</p>
-                        <div className="flex gap-1">
-                            <button className="px-3 py-1 border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-50">Prev</button>
-                            <button className="px-3 py-1 bg-indigo-600 text-white rounded">1</button>
-                            <button className="px-3 py-1 border border-slate-200 rounded hover:bg-slate-50">Next</button>
+                    {!isLoading && totalPages > 1 && (
+                        <div className="p-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50/50">
+                            <span className="text-xs text-slate-500 font-medium order-2 sm:order-1">
+                                Showing <strong className="text-slate-700">{(page - 1) * limit + 1}</strong> to{" "}
+                                <strong className="text-slate-700">
+                                    {Math.min(page * limit, totalCount)}
+                                </strong>{" "}
+                                of <strong className="text-slate-700">{totalCount}</strong> invoices
+                            </span>
+                            
+                            <div className="flex gap-1.5 order-1 sm:order-2">
+                                <button
+                                    onClick={() => setPage(prev => Math.max(1, prev - 1))}
+                                    disabled={page === 1}
+                                    className="px-3 py-1.5 border border-slate-200 rounded-xl bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-semibold shadow-sm transition-all"
+                                >
+                                    Prev
+                                </button>
+                                {(() => {
+                                    const pages = [];
+                                    let startPage = Math.max(1, page - 2);
+                                    let endPage = Math.min(totalPages, page + 2);
+                                    if (endPage - startPage < 4) {
+                                        if (startPage === 1) {
+                                            endPage = Math.min(totalPages, 5);
+                                        } else if (endPage === totalPages) {
+                                            startPage = Math.max(1, totalPages - 4);
+                                        }
+                                    }
+                                    for (let i = startPage; i <= endPage; i++) {
+                                        pages.push(i);
+                                    }
+                                    
+                                    return (
+                                        <>
+                                            {startPage > 1 && (
+                                                <>
+                                                    <button
+                                                        onClick={() => setPage(1)}
+                                                        className={`px-3 py-1.5 border rounded-xl text-xs font-semibold shadow-sm transition-all ${
+                                                            page === 1
+                                                                ? "bg-indigo-600 border-indigo-600 text-white"
+                                                                : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                                                        }`}
+                                                    >
+                                                        1
+                                                    </button>
+                                                    {startPage > 2 && <span className="text-slate-400 px-1 self-center text-xs">...</span>}
+                                                </>
+                                            )}
+                                            {pages.map(p => (
+                                                <button
+                                                    key={p}
+                                                    onClick={() => setPage(p)}
+                                                    className={`px-3 py-1.5 border rounded-xl text-xs font-semibold shadow-sm transition-all ${
+                                                        page === p
+                                                            ? "bg-indigo-600 border-indigo-600 text-white shadow-indigo-100"
+                                                            : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                                                    }`}
+                                                >
+                                                    {p}
+                                                </button>
+                                            ))}
+                                            {endPage < totalPages && (
+                                                <>
+                                                    {endPage < totalPages - 1 && <span className="text-slate-400 px-1 self-center text-xs">...</span>}
+                                                    <button
+                                                        onClick={() => setPage(totalPages)}
+                                                        className={`px-3 py-1.5 border rounded-xl text-xs font-semibold shadow-sm transition-all ${
+                                                            page === totalPages
+                                                                ? "bg-indigo-600 border-indigo-600 text-white"
+                                                                : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                                                        }`}
+                                                    >
+                                                        {totalPages}
+                                                    </button>
+                                                </>
+                                            )}
+                                        </>
+                                    );
+                                })()}
+                                <button
+                                    onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
+                                    disabled={page === totalPages}
+                                    className="px-3 py-1.5 border border-slate-200 rounded-xl bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-semibold shadow-sm transition-all"
+                                >
+                                    Next
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </Card>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

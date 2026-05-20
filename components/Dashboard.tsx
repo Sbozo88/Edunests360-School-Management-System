@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar
@@ -15,6 +15,7 @@ import { Modal } from './ui/Modal';
 import { UserRole, ChartDataPoint } from '../types';
 import { ANNUAL_EVENTS, INITIAL_STUDENTS, INITIAL_TEACHERS, INITIAL_STAFF, INITIAL_INVOICES, SCHOOL_PROFILE, TERM_DATES_2026 } from '../data';
 import { getGreeting, formatCurrency } from '../locale';
+import { getDashboardStats } from '../src/api';
 
 // Custom Rand icon since Lucide doesn't have one
 const RandIcon = ({ size = 22 }: { size?: number }) => (
@@ -94,14 +95,30 @@ const AdminDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
   const [newSessionYear, setNewSessionYear] = useState('');
   const [selectedNotice, setSelectedNotice] = useState<any>(null);
+  const [stats, setStats] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    getDashboardStats()
+      .then(data => {
+        setStats(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to load dashboard statistics:", err);
+        setIsLoading(false);
+      });
+  }, []);
 
   const currentSession = sessions.find(s => s.id === activeSessionId) || sessions[0];
   const greeting = useMemo(() => getGreeting(), []);
 
-  const totalStudents = INITIAL_STUDENTS.length;
-  const totalTeachers = INITIAL_TEACHERS.length;
-  const totalStaff = INITIAL_STAFF.length;
-  const totalRevenue = INITIAL_INVOICES.reduce((sum, inv) => inv.status === 'Paid' ? sum + inv.amount : sum, 0);
+  const totalStudents = stats?.totalStudents ?? INITIAL_STUDENTS.length;
+  const totalTeachers = stats?.totalTeachers ?? INITIAL_TEACHERS.length;
+  const totalStaff = stats?.totalStaff ?? INITIAL_STAFF.length;
+  const totalRevenue = stats?.totalRevenue ?? INITIAL_INVOICES.reduce((sum, inv) => inv.status === 'Paid' ? sum + inv.amount : sum, 0);
+  const chartFinancialData = stats?.financialData ?? financialData;
+  const recentCollections = stats?.recentCollections ?? INITIAL_INVOICES.slice(0, 3);
 
   const handleSetActiveSession = (id: number) => {
     setActiveSessionId(id);
@@ -130,6 +147,96 @@ const AdminDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     { id: 2, title: 'RPS Extra-Murals', date: '21 Jan', content: 'Soccer, netball, swimming, kung fu, coding and robotics, Maths 24, spelling bees, art, music, and Hooked on Books are active for planning.' },
     { id: 3, title: 'Annual Events', date: 'TBC', content: `${ANNUAL_EVENTS.join(', ')} are tracked in the school events calendar.` }
   ];
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 animate-fade-in-up">
+          <div>
+            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">{greeting}, Ms Seema 👋</h1>
+            <p className="text-slate-400 mt-1">{SCHOOL_PROFILE.name} · {SCHOOL_PROFILE.motto}</p>
+          </div>
+          <div className="flex gap-2">
+            <div className="w-24 h-10 bg-slate-100 rounded-xl animate-pulse"></div>
+            <div className="w-36 h-10 bg-slate-100 rounded-xl animate-pulse"></div>
+          </div>
+        </div>
+
+        {/* Stats Grid Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="bg-white/40 backdrop-blur-md border border-white/20 p-5 rounded-2xl shadow-sm h-32 flex flex-col justify-between animate-pulse">
+              <div className="flex justify-between items-start">
+                <div className="space-y-2">
+                  <div className="w-16 h-3 bg-slate-200/60 rounded"></div>
+                  <div className="w-24 h-8 bg-slate-200/80 rounded-md"></div>
+                </div>
+                <div className="w-10 h-10 bg-slate-200/60 rounded-xl"></div>
+              </div>
+              <div className="w-20 h-3 bg-slate-200/40 rounded"></div>
+            </div>
+          ))}
+        </div>
+
+        {/* Charts Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div className="lg:col-span-2 bg-white/40 backdrop-blur-md border border-white/20 p-6 rounded-2xl shadow-sm h-[380px] flex flex-col justify-between animate-pulse">
+            <div className="flex justify-between items-center">
+              <div className="w-32 h-5 bg-slate-200/80 rounded"></div>
+              <div className="w-8 h-8 bg-slate-200/60 rounded-full"></div>
+            </div>
+            <div className="h-[260px] bg-slate-200/30 rounded-xl w-full"></div>
+          </div>
+          <div className="bg-white/40 backdrop-blur-md border border-white/20 p-6 rounded-2xl shadow-sm h-[380px] flex flex-col justify-between animate-pulse">
+            <div className="flex justify-between items-center">
+              <div className="w-24 h-5 bg-slate-200/80 rounded"></div>
+              <div className="w-12 h-6 bg-slate-200/60 rounded-full"></div>
+            </div>
+            <div className="h-[260px] bg-slate-200/30 rounded-xl w-full"></div>
+          </div>
+        </div>
+
+        {/* Notices & Fee Collections Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="bg-white/40 backdrop-blur-md border border-white/20 p-6 rounded-2xl shadow-sm h-64 flex flex-col justify-between animate-pulse">
+            <div className="w-28 h-5 bg-slate-200/80 rounded mb-4"></div>
+            <div className="space-y-3 flex-1">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-slate-200/60 rounded-xl shrink-0"></div>
+                  <div className="space-y-2 flex-1">
+                    <div className="w-1/3 h-4 bg-slate-200/80 rounded"></div>
+                    <div className="w-2/3 h-3 bg-slate-200/40 rounded"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="bg-white/40 backdrop-blur-md border border-white/20 p-6 rounded-2xl shadow-sm h-64 flex flex-col justify-between animate-pulse">
+            <div className="w-36 h-5 bg-slate-200/80 rounded mb-4"></div>
+            <div className="space-y-3 flex-1">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="w-9 h-9 bg-slate-200/60 rounded-xl shrink-0"></div>
+                    <div className="space-y-2 flex-1">
+                      <div className="w-1/2 h-4 bg-slate-200/80 rounded"></div>
+                      <div className="w-1/4 h-3 bg-slate-200/40 rounded"></div>
+                    </div>
+                  </div>
+                  <div className="space-y-2 text-right">
+                    <div className="w-12 h-4 bg-slate-200/80 rounded ml-auto"></div>
+                    <div className="w-8 h-3 bg-slate-200/40 rounded ml-auto"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -173,7 +280,7 @@ const AdminDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         <Card className="lg:col-span-2" title="Financial Overview" action={<button onClick={() => onNavigate('expenses')} className="text-slate-400 hover:text-slate-600 transition-colors"><MoreHorizontal size={18} /></button>}>
           <div className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={financialData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+              <AreaChart data={chartFinancialData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2} />
@@ -235,10 +342,10 @@ const AdminDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
         <Card title="Recent Fee Collections">
           <div className="space-y-2">
-            {INITIAL_INVOICES.slice(0, 3).map((inv, i) => (
+            {recentCollections.map((inv: any, i: number) => (
               <div key={i} onClick={() => onNavigate('fees')} className="flex items-center justify-between p-3 border border-slate-50 hover:border-slate-100 rounded-xl hover:bg-slate-50/50 cursor-pointer transition-all group">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 overflow-hidden flex items-center justify-center text-xs font-bold text-emerald-600">{inv.studentName.charAt(0)}</div>
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 overflow-hidden flex items-center justify-center text-xs font-bold text-emerald-600">{inv.studentName?.charAt(0) || 'S'}</div>
                   <div>
                     <h5 className="font-semibold text-slate-800 text-sm group-hover:text-slate-900">{inv.studentName}</h5>
                     <p className="text-[11px] text-slate-400">{inv.type}</p>

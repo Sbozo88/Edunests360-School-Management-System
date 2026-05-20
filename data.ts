@@ -17,7 +17,7 @@ export const SCHOOL_PROFILE = {
     foundationPhase: '13:30',
     intersenPhase: '13:45',
   },
-  standardAnnualFee: 14500,
+  standardAnnualFee: 15500,
 };
 
 export const TERM_DATES_2026 = [
@@ -99,11 +99,11 @@ export const INITIAL_STAFF = [
 ];
 
 export const INITIAL_INVOICES: Invoice[] = [
-  { id: '1', invoiceNo: 'INV-001', studentName: 'Sithembiso', studentId: 'RPS-001', amount: 14500, status: 'Paid', date: '14 Jan 2026', type: 'School Fees' },
-  { id: '2', invoiceNo: 'INV-002', studentName: 'Siyamthanda', studentId: 'RPS-002', amount: 14500, status: 'Paid', date: '14 Jan 2026', type: 'School Fees' },
-  { id: '3', invoiceNo: 'INV-003', studentName: 'Sihle', studentId: 'RPS-003', amount: 7250, status: 'Pending', date: '8 Apr 2026', type: 'School Fees' },
-  { id: '4', invoiceNo: 'INV-004', studentName: 'Shawn', studentId: 'RPS-004', amount: 7250, status: 'Pending', date: '8 Apr 2026', type: 'School Fees' },
-  { id: '5', invoiceNo: 'INV-005', studentName: 'Aarav Naidoo', studentId: 'RPS-006', amount: 14500, status: 'Overdue', date: '14 Jan 2026', type: 'School Fees' },
+  { id: '1', invoiceNo: 'INV-001', studentName: 'Sithembiso', studentId: 'RPS-001', amount: 15500, status: 'Paid', date: '14 Jan 2026', type: 'School Fees' },
+  { id: '2', invoiceNo: 'INV-002', studentName: 'Siyamthanda', studentId: 'RPS-002', amount: 15500, status: 'Paid', date: '14 Jan 2026', type: 'School Fees' },
+  { id: '3', invoiceNo: 'INV-003', studentName: 'Sihle', studentId: 'RPS-003', amount: 7750, status: 'Pending', date: '8 Apr 2026', type: 'School Fees' },
+  { id: '4', invoiceNo: 'INV-004', studentName: 'Shawn', studentId: 'RPS-004', amount: 7750, status: 'Pending', date: '8 Apr 2026', type: 'School Fees' },
+  { id: '5', invoiceNo: 'INV-005', studentName: 'Aarav Naidoo', studentId: 'RPS-006', amount: 15500, status: 'Overdue', date: '14 Jan 2026', type: 'School Fees' },
 ];
 
 export const INITIAL_CLASSES = [

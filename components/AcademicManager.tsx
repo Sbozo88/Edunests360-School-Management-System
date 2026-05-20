@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { INITIAL_TEACHERS as DATA_TEACHERS, INITIAL_STUDENTS, INITIAL_CLASSES, INITIAL_ROUTINES } from '../data';
 import { UserRole } from '../types';
-import { getClasses, getRoutines, saveRoutine, deleteRoutine } from '../src/api';
+import { getClasses, getRoutines, saveRoutine, deleteRoutine, getSubjects, saveSubject, deleteSubject } from '../src/api';
 
 interface AcademicManagerProps {
   view: string;
@@ -168,14 +168,32 @@ export const AcademicManager: React.FC<AcademicManagerProps> = ({ view, userRole
       setIsLoading(true);
       const classesData = await getClasses();
       const routinesData = await getRoutines();
+      const subjectsData = await getSubjects();
       setClasses(classesData);
       setRoutines(routinesData);
+      setSubjects(subjectsData);
     } catch (err: any) {
       console.error("Failed to load academic data:", err);
       setClasses(INITIAL_CLASSES);
       setRoutines(INITIAL_ROUTINES);
+      setSubjects(INITIAL_SUBJECTS);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleClassSelectionChange = async (classId: string) => {
+    setSelectedClassId(classId);
+    setActiveStudentId('');
+
+    try {
+      const classSubjects = await getSubjects(classId);
+      setSubjects(prev => [
+        ...prev.filter(subject => subject.classId !== classId),
+        ...classSubjects
+      ]);
+    } catch (err) {
+      console.error("Failed to refresh class subjects:", err);
     }
   };
 
@@ -291,31 +309,38 @@ export const AcademicManager: React.FC<AcademicManagerProps> = ({ view, userRole
     setShowSubjectModal(true);
   };
 
-  const handleSaveSubject = () => {
+  const handleSaveSubject = async () => {
     if (!newSubjectData.name || !selectedClassId) return;
 
-    if (editingSubjectId) {
-      setSubjects(prev => prev.map(s => s.id === editingSubjectId ? {
-        ...s,
-        name: newSubjectData.name,
-        teacherId: newSubjectData.teacherId
-      } : s));
-    } else {
-      setSubjects([...subjects, {
-        id: `SUB-${Date.now()}`,
+    try {
+      const subId = editingSubjectId || `SUB-${Date.now()}`;
+      const payload = {
+        id: subId,
         name: newSubjectData.name,
         classId: selectedClassId,
         teacherId: newSubjectData.teacherId
-      }]);
+      };
+      await saveSubject(payload);
+      const subjectsData = await getSubjects();
+      setSubjects(subjectsData);
+      setNewSubjectData({ name: '', teacherId: '' });
+      setShowSubjectModal(false);
+      setIsNewSubject(false);
+    } catch (err) {
+      console.error("Error saving subject:", err);
     }
-    setNewSubjectData({ name: '', teacherId: '' });
-    setShowSubjectModal(false);
-    setIsNewSubject(false);
   };
 
-  const handleDeleteSubject = (id: string) => {
-    if (window.confirm('Delete this subject?')) {
-      setSubjects(subjects.filter(s => s.id !== id));
+  const handleDeleteSubject = async (id: string) => {
+    if (window.confirm('Delete this subject? This will also remove any assigned routines.')) {
+      try {
+        await deleteSubject(id);
+        const subjectsData = await getSubjects();
+        setSubjects(subjectsData);
+        setRoutines(prev => prev.filter(r => r.subjectId !== id));
+      } catch (err) {
+        console.error("Error deleting subject:", err);
+      }
     }
   };
 
@@ -431,7 +456,7 @@ export const AcademicManager: React.FC<AcademicManagerProps> = ({ view, userRole
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {sectionClasses.map(cls => {
                   const teacher = teachers.find(t => t.id === cls.teacherId);
-                  const room = classrooms.find(r => r.id === cls.roomId);
+                  const room = classrooms.find(r => r.id === cls.roomId || r.name === cls.roomId);
                   const ClassIcon = getCategoryIcon(cls.name, 24);
 
                   return (
@@ -513,7 +538,7 @@ export const AcademicManager: React.FC<AcademicManagerProps> = ({ view, userRole
           <label className="text-sm font-bold text-slate-700 whitespace-nowrap">Select Class:</label>
           <select
             value={selectedClassId}
-            onChange={(e) => setSelectedClassId(e.target.value)}
+            onChange={(e) => handleClassSelectionChange(e.target.value)}
             className="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5 min-w-[200px]"
           >
             {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -583,58 +608,66 @@ export const AcademicManager: React.FC<AcademicManagerProps> = ({ view, userRole
   );
 
   const renderTimetableView = () => {
-    // Only Saturday lessons
-    const days = ['Saturday'];
-    const times = ['08:00 AM', '08:30 AM', '09:00 AM', '09:30 AM', '10:00 AM', '10:30 AM'];
+    // Weekdays Monday to Friday
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    const times = ['08:00 AM', '08:45 AM', '09:30 AM', '10:45 AM', '11:30 AM', '12:15 PM', '01:00 PM'];
 
     // Get current class details for Room Display
     const currentClass = classes.find(c => c.id === selectedClassId);
-    const defaultRoom = classrooms.find(r => r.id === currentClass?.roomId);
+    const defaultRoom = classrooms.find(r => r.id === currentClass?.roomId || r.name === currentClass?.roomId);
 
-    const handleSlotClick = (day: string, time: string) => {
+    const handleSlotClick = async (day: string, time: string) => {
       if (!canEdit) return;
       if (!activeTool) {
         alert("Please select a subject or eraser from the dropdown above first.");
         return;
       }
 
-      if (activeTool === 'eraser') {
-        setRoutines(prev => prev.filter(r => !(r.classId === selectedClassId && r.day === day && r.timeSlot === time)));
-        return;
-      }
+      try {
+        if (activeTool === 'eraser') {
+          const routineToDelete = routines.find(r => r.classId === selectedClassId && r.day === day && r.timeSlot === time);
+          if (routineToDelete) {
+            await deleteRoutine(routineToDelete.id);
+            const routinesData = await getRoutines();
+            setRoutines(routinesData);
+          }
+          return;
+        }
 
-      // --- Auto-Assign Logic ---
-      // 1. Check if the subject exists for this class
-      const subjectName = activeTool;
-      let targetSubject = subjects.find(s => s.classId === selectedClassId && s.name === subjectName);
-      let targetSubjectId = targetSubject?.id;
+        const subjectName = activeTool;
+        let targetSubject = subjects.find(s => s.classId === selectedClassId && s.name === subjectName);
+        let targetSubjectId = targetSubject?.id;
 
-      // 2. If not, create it on the fly
-      if (!targetSubject) {
-        const newId = `SUB-${Date.now()}`;
-        const newSubject: Subject = {
-          id: newId,
-          name: subjectName,
-          classId: selectedClassId,
-          teacherId: '' // Default unassigned
-        };
-        setSubjects(prev => [...prev, newSubject]);
-        targetSubjectId = newId;
-      }
+        if (!targetSubject) {
+          const newId = `SUB-${Date.now()}`;
+          const newSubject = {
+            id: newId,
+            name: subjectName,
+            classId: selectedClassId,
+            teacherId: '' // Default unassigned
+          };
+          await saveSubject(newSubject);
+          targetSubjectId = newId;
+          const subjectsData = await getSubjects();
+          setSubjects(subjectsData);
+        }
 
-      // 3. Assign to Routine
-      setRoutines(prev => {
-        // Remove existing for this slot
-        const filtered = prev.filter(r => !(r.classId === selectedClassId && r.day === day && r.timeSlot === time));
-        return [...filtered, {
-          id: `RT-${Date.now()}`,
-          classId: selectedClassId,
+        const routineId = `RT-${Date.now()}`;
+        const payload = {
+          id: routineId,
+          class_id: selectedClassId,
           day,
-          timeSlot: time,
-          subjectId: targetSubjectId!,
-          studentId: activeStudentId || undefined
-        }];
-      });
+          time_slot: time,
+          subject_id: targetSubjectId!,
+          student_id: activeStudentId || null
+        };
+
+        await saveRoutine(payload);
+        const routinesData = await getRoutines();
+        setRoutines(routinesData);
+      } catch (err) {
+        console.error("Error updating slot:", err);
+      }
     };
 
     return (
@@ -644,7 +677,7 @@ export const AcademicManager: React.FC<AcademicManagerProps> = ({ view, userRole
             <label className="text-sm font-bold text-slate-700 whitespace-nowrap">Configure Routine:</label>
             <select
               value={selectedClassId}
-              onChange={(e) => setSelectedClassId(e.target.value)}
+              onChange={(e) => handleClassSelectionChange(e.target.value)}
               className="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-lg p-2.5 min-w-[200px] outline-none"
             >
               {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -803,7 +836,21 @@ export const AcademicManager: React.FC<AcademicManagerProps> = ({ view, userRole
                         </div>
 
                         {canEdit && (
-                          <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100">
+                          <div 
+                            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 z-10"
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              if (window.confirm("Remove this routine slot?")) {
+                                try {
+                                  await deleteRoutine(routine.id);
+                                  const routinesData = await getRoutines();
+                                  setRoutines(routinesData);
+                                } catch (err) {
+                                  console.error("Error deleting routine:", err);
+                                }
+                              }
+                            }}
+                          >
                             <div className="w-4 h-4 rounded-full bg-red-100 text-red-500 flex items-center justify-center hover:bg-red-200">
                               <X size={10} />
                             </div>

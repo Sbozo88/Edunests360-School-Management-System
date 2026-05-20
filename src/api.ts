@@ -18,7 +18,27 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 }
 
 // Students
-export const getStudents = () => fetchAPI('/api/students');
+export const getStudents = (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    class?: string;
+    grade?: string;
+    status?: string;
+    fee?: string;
+}) => {
+    const query = new URLSearchParams();
+    if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                query.append(key, String(value));
+            }
+        });
+    }
+    const queryString = query.toString();
+    return fetchAPI(queryString ? `/api/students?${queryString}` : '/api/students');
+};
+
 export const getStudent = (id: string) => fetchAPI(`/api/students/${id}`);
 export const createStudent = (data: any) => fetchAPI('/api/students', { method: 'POST', body: JSON.stringify(data) });
 export const updateStudent = (id: string, data: any) => fetchAPI(`/api/students/${id}`, { method: 'PUT', body: JSON.stringify(data) });
@@ -39,8 +59,36 @@ export const getRoutines = (classId?: string) => {
 export const saveRoutine = (data: any) => fetchAPI('/api/routines', { method: 'POST', body: JSON.stringify(data) });
 export const deleteRoutine = (id: string) => fetchAPI(`/api/routines/${id}`, { method: 'DELETE' });
 
+// Subjects
+export const getSubjects = (classId?: string) => {
+    const url = classId ? `/api/subjects?classId=${classId}` : '/api/subjects';
+    return fetchAPI(url);
+};
+export const saveSubject = (data: any) => fetchAPI('/api/subjects', { method: 'POST', body: JSON.stringify(data) });
+export const deleteSubject = (id: string) => fetchAPI(`/api/subjects/${id}`, { method: 'DELETE' });
+
 // Invoices
-export const getInvoices = () => fetchAPI('/api/invoices');
+export const getInvoices = (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+}) => {
+    const query = new URLSearchParams();
+    if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                query.append(key, String(value));
+            }
+        });
+    }
+    const queryString = query.toString();
+    return fetchAPI(queryString ? `/api/invoices?${queryString}` : '/api/invoices');
+};
+
+// Dashboard
+export const getDashboardStats = () => fetchAPI('/api/dashboard');
 
 // DB Admin
 export const seedDatabase = () => fetchAPI('/api/db-seed');
+

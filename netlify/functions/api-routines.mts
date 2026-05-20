@@ -40,10 +40,24 @@ export default async (req: Request, context: Context) => {
 
         if (method === 'POST') {
             const data = await req.json();
-            const { id, class_id, day, time_slot, subject_id, student_id } = data;
+            const id = data.id;
+            const classId = data.class_id ?? data.classId;
+            const timeSlot = data.time_slot ?? data.timeSlot;
+            const subjectId = data.subject_id ?? data.subjectId;
+            const studentId = data.student_id ?? data.studentId ?? null;
+
+            if (!id || !classId || !data.day || !timeSlot || !subjectId) {
+                return new Response(JSON.stringify({
+                    error: "Missing required routine fields: id, classId, day, timeSlot, subjectId"
+                }), {
+                    status: 400,
+                    headers: { "Content-Type": "application/json" }
+                });
+            }
+
             await db`
         INSERT INTO routines (id, class_id, day, time_slot, subject_id, student_id)
-        VALUES (${id}, ${class_id}, ${day}, ${time_slot}, ${subject_id}, ${student_id})
+        VALUES (${id}, ${classId}, ${data.day}, ${timeSlot}, ${subjectId}, ${studentId})
         ON CONFLICT (id) DO UPDATE SET
           class_id = EXCLUDED.class_id,
           day = EXCLUDED.day,
