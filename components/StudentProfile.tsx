@@ -16,16 +16,16 @@ interface StudentProfileProps {
 
 // Mock Data structure for fallback
 const mockStudentData = {
-    id: 'STD-2023-001',
-    name: 'Alex Morgan',
-    class: 'Grade 10',
+    id: 'RPS-001',
+    name: 'Sithembiso',
+    class: '7T',
     section: 'A',
     rollNo: '24',
-    avatar: 'https://images.unsplash.com/photo-1544717305-2782549b5136?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80',
-    guardian: 'Robert Morgan',
-    email: 'alex.m@school.com',
-    phone: '+1 (555) 123-4567',
-    address: '42 Willow Lane, Springfield, IL',
+    avatar: 'https://ui-avatars.com/api/?name=Sithembiso&background=3b82f6&color=fff&size=256',
+    guardian: 'RPS Parent 1',
+    email: 'sithembiso@rempark.co.za',
+    phone: '011 882 4002',
+    address: '30 Heine Road, Rembrandt Park, Johannesburg, 2090',
     dob: '2008-05-15',
     gender: 'Female',
     bloodGroup: 'B+',
@@ -67,8 +67,8 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ userRole, id }) 
         ...mockStudentData,
         id: foundStudent.id,
         name: foundStudent.name,
-        class: foundStudent.class.split('-')[0] || 'Grade 10',
-        section: foundStudent.class.split('-')[1] || 'A',
+        class: foundStudent.class,
+        section: foundStudent.class.replace(/[0-9R]/g, '') || 'A',
         guardian: foundStudent.parent,
         email: foundStudent.email,
         attendance: foundStudent.attendance || 92
@@ -84,8 +84,8 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ userRole, id }) 
                 ...mockStudentData,
                 id: newFound.id,
                 name: newFound.name,
-                class: newFound.class.split('-')[0] || 'Grade 10',
-                section: newFound.class.split('-')[1] || 'A',
+                class: newFound.class,
+                section: newFound.class.replace(/[0-9R]/g, '') || 'A',
                 guardian: newFound.parent,
                 email: newFound.email,
                 attendance: newFound.attendance || 92
@@ -529,10 +529,10 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ userRole, id }) 
                         <div className="space-y-4 relative">
                             <div className="absolute left-2 top-0 bottom-0 w-0.5 bg-slate-200"></div>
                             {[
-                                { time: '08:30 AM', subject: 'Violin Practice' },
-                                { time: '09:00 AM', subject: 'Music Theory' },
+                                { time: '07:30 AM', subject: 'Register / Life Skills' },
+                                { time: '08:30 AM', subject: 'English HL' },
                                 { time: '09:30 AM', subject: 'Ensemble Skills' },
-                                { time: '10:00 AM', subject: 'Orchestra Rehearsal' },
+                                { time: '10:00 AM', subject: 'Coding and Robotics' },
                             ].map((slot, i) => (
                                 <div key={i} className="flex gap-4 relative">
                                     <div className="w-4 h-4 rounded-full bg-indigo-600 border-2 border-white absolute left-0 top-1"></div>

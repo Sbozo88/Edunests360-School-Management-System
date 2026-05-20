@@ -13,7 +13,7 @@ import {
 import { Card } from './ui/Card';
 import { Modal } from './ui/Modal';
 import { UserRole, ChartDataPoint } from '../types';
-import { INITIAL_STUDENTS, INITIAL_TEACHERS, INITIAL_STAFF, INITIAL_INVOICES } from '../data';
+import { ANNUAL_EVENTS, INITIAL_STUDENTS, INITIAL_TEACHERS, INITIAL_STAFF, INITIAL_INVOICES, SCHOOL_PROFILE, TERM_DATES_2026 } from '../data';
 import { getGreeting, formatCurrency } from '../locale';
 
 // Custom Rand icon since Lucide doesn't have one
@@ -30,13 +30,13 @@ interface DashboardProps {
 // Shared Data
 // ==========================================
 const financialData: ChartDataPoint[] = [
-  { name: 'Jan', income: 72000, expense: 43200, students: 2400 },
-  { name: 'Feb', income: 54000, expense: 25164, students: 2210 },
-  { name: 'Mar', income: 36000, expense: 176400, students: 2290 },
-  { name: 'Apr', income: 50040, expense: 70344, students: 2000 },
-  { name: 'May', income: 34020, expense: 86400, students: 2181 },
-  { name: 'Jun', income: 43020, expense: 68400, students: 2500 },
-  { name: 'Jul', income: 62820, expense: 77400, students: 2100 },
+  { name: 'Jan', income: 116000, expense: 68400, students: 8 },
+  { name: 'Feb', income: 58000, expense: 42100, students: 8 },
+  { name: 'Mar', income: 43500, expense: 38900, students: 8 },
+  { name: 'Apr', income: 72500, expense: 51200, students: 8 },
+  { name: 'May', income: 43500, expense: 46700, students: 8 },
+  { name: 'Jun', income: 29000, expense: 44600, students: 8 },
+  { name: 'Jul', income: 58000, expense: 49300, students: 8 },
 ];
 
 const attendanceData = [
@@ -86,9 +86,9 @@ const StatCard = ({ title, value, trend, icon: Icon, gradient, bgLight, textColo
 // ==========================================
 const AdminDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const [sessions, setSessions] = useState([
-    { id: 1, year: '2025-2026', status: 'Completed', currentTerm: 'Final Term' },
-    { id: 2, year: '2026-2027', status: 'Active', currentTerm: 'Term 1 (Autumn)' },
-    { id: 3, year: '2027-2028', status: 'Upcoming', currentTerm: 'Admission Open' },
+    { id: 1, year: '2025', status: 'Completed', currentTerm: 'Final Term' },
+    { id: 2, year: '2026', status: 'Active', currentTerm: `${TERM_DATES_2026[0].term}: ${TERM_DATES_2026[0].dates}` },
+    { id: 3, year: '2027', status: 'Upcoming', currentTerm: 'Admissions Planning' },
   ]);
   const [activeSessionId, setActiveSessionId] = useState(2);
   const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
@@ -126,9 +126,9 @@ const AdminDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   };
 
   const notices = [
-    { id: 1, title: 'Annual Sports Day', date: '30 Oct', content: 'Annual sports day registration is now open. All house captains must submit list of participants by Friday.' },
-    { id: 2, title: 'Parent Teacher Meeting', date: '05 Nov', content: 'PTM for Grade 10 will be held on November 5th from 9 AM to 12 PM.' },
-    { id: 3, title: 'Winter Vacation', date: '15 Dec', content: 'School will remain closed for winter break from Dec 20 to Jan 5.' }
+    { id: 1, title: '2026 Term Calendar', date: '14 Jan', content: `${TERM_DATES_2026.map(term => `${term.term}: ${term.dates}`).join(' · ')}` },
+    { id: 2, title: 'RPS Extra-Murals', date: '21 Jan', content: 'Soccer, netball, swimming, kung fu, coding and robotics, Maths 24, spelling bees, art, music, and Hooked on Books are active for planning.' },
+    { id: 3, title: 'Annual Events', date: 'TBC', content: `${ANNUAL_EVENTS.join(', ')} are tracked in the school events calendar.` }
   ];
 
   return (
@@ -136,8 +136,8 @@ const AdminDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 animate-fade-in-up">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">{greeting}, Principal Anderson 👋</h1>
-          <p className="text-slate-400 mt-1">Here's what's happening at your institution today.</p>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">{greeting}, Ms Seema 👋</h1>
+          <p className="text-slate-400 mt-1">{SCHOOL_PROFILE.name} · {SCHOOL_PROFILE.motto}</p>
         </div>
         <div className="flex gap-2">
           <button onClick={() => alert("Generating comprehensive daily report...")} className="px-4 py-2 bg-white text-slate-600 border border-slate-200 rounded-xl text-sm font-medium hover:bg-slate-50 transition-all flex items-center gap-2 btn-lift">
@@ -260,7 +260,7 @@ const AdminDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
             <h4 className="text-sm font-bold text-slate-700 mb-3">Add New Academic Year</h4>
             <div className="flex gap-2">
-              <input type="text" placeholder="e.g. 2025-2026" value={newSessionYear} onChange={(e) => setNewSessionYear(e.target.value)} className="flex-1 px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300 transition-all input-premium" />
+              <input type="text" placeholder="e.g. 2026" value={newSessionYear} onChange={(e) => setNewSessionYear(e.target.value)} className="flex-1 px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300 transition-all input-premium" />
               <button onClick={handleAddSession} className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl text-sm font-medium hover:from-indigo-700 hover:to-violet-700 flex items-center gap-2 btn-lift shadow-lg shadow-indigo-200/50">
                 <Plus size={15} /> Add
               </button>
@@ -324,14 +324,14 @@ const TeacherDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const myStudentCount = INITIAL_STUDENTS.filter(s => s.status === 'Active').length;
 
   const todaySchedule = [
-    { time: '08:30 – 09:30', class: 'Beginner Violin', room: 'Room A1', students: 12 },
-    { time: '09:30 – 10:30', class: 'Intermediate Violin', room: 'Room A2', students: 8 },
-    { time: '08:30 – 10:30', class: 'Orchestra Practice', room: 'Hall B', students: 24 },
+    { time: '07:30 – 08:30', class: 'Grade 7T Register', room: 'Room 15', students: 32 },
+    { time: '08:30 – 09:30', class: 'English HL', room: 'Room 19', students: 31 },
+    { time: '10:30 – 11:30', class: 'Coding and Robotics', room: 'Computer Lab', students: 28 },
   ];
 
   const pendingHomework = [
-    { subject: 'Beginner Violin', title: 'Scales Practice Sheet', submitted: 8, total: 12, dueDate: '21 Feb 2026' },
-    { subject: 'Intermediate Violin', title: 'Suzuki Book 2 - Piece 4', submitted: 5, total: 8, dueDate: '22 Feb 2026' },
+    { subject: 'English HL', title: 'Comprehension worksheet', submitted: 24, total: 32, dueDate: '21 Feb 2026' },
+    { subject: 'Coding and Robotics', title: 'Algorithm pattern task', submitted: 19, total: 28, dueDate: '22 Feb 2026' },
   ];
 
   return (
@@ -424,19 +424,19 @@ const StudentDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const student = INITIAL_STUDENTS[0]; // Mock logged-in student
 
   const todaySchedule = [
-    { time: '08:30 – 09:30', subject: 'Violin Practice', teacher: 'Isaac Molelekwa', room: 'Room A1' },
-    { time: '09:30 – 10:30', subject: 'Music Theory', teacher: 'Nomonde JPO', room: 'Room B2' },
-    { time: '08:30 – 10:30', subject: 'Orchestra Rehearsal', teacher: 'Vusi Hlatswayo', room: 'Hall B' },
+    { time: '07:30 – 08:30', subject: 'Register / Life Skills', teacher: 'Ms Vilakazi', room: 'Room 15' },
+    { time: '08:30 – 09:30', subject: 'English HL', teacher: 'Ms Vilakazi', room: 'Room 19' },
+    { time: '10:30 – 11:30', subject: 'Coding and Robotics', teacher: 'Mr Mokoena', room: 'Computer Lab' },
   ];
 
   const upcomingExams = [
-    { subject: 'Music Theory', date: '25 Feb 2026', type: 'Mid-Term' },
-    { subject: 'Violin Practical', date: '28 Feb 2026', type: 'Practical' },
+    { subject: 'English HL', date: '25 Feb 2026', type: 'Formal Assessment' },
+    { subject: 'Mathematics', date: '28 Feb 2026', type: 'Class Test' },
   ];
 
   const homeworkDue = [
-    { subject: 'Violin', title: 'Scales Practice Sheet', dueDate: '21 Feb 2026', status: 'Pending' },
-    { subject: 'Music Theory', title: 'Chord Analysis Worksheet', dueDate: '23 Feb 2026', status: 'Submitted' },
+    { subject: 'English HL', title: 'Comprehension worksheet', dueDate: '21 Feb 2026', status: 'Pending' },
+    { subject: 'Coding and Robotics', title: 'Algorithm pattern task', dueDate: '23 Feb 2026', status: 'Submitted' },
   ];
 
   const feeStatus = INITIAL_INVOICES.find(inv => inv.studentId === student.id);
@@ -541,7 +541,7 @@ const StudentDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 // ==========================================
 const ParentDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const greeting = useMemo(() => getGreeting(), []);
-  const parentName = "Robert Morgan";
+  const parentName = "RPS Parent 1";
   const children = INITIAL_STUDENTS.filter(s => s.parent === parentName);
   const childInvoices = INITIAL_INVOICES.filter(inv => children.some(c => c.id === inv.studentId));
   const totalOwed = childInvoices.filter(inv => inv.status !== 'Paid').reduce((sum, inv) => sum + inv.amount, 0);
@@ -555,8 +555,8 @@ const ParentDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   ];
 
   const notices = [
-    { id: 1, title: 'Annual Sports Day', date: '30 Oct', content: 'Registration now open.' },
-    { id: 2, title: 'Parent Teacher Meeting', date: '05 Nov', content: 'Grade 10 PTM from 9 AM to 12 PM.' },
+    { id: 1, title: 'Annual Sports Day', date: 'TBC', content: 'Registration and house planning are tracked for RPS.' },
+    { id: 2, title: 'Parent Teacher Meeting', date: 'TBC', content: 'Grade and phase meetings are scheduled through the RPS calendar.' },
   ];
 
   return (

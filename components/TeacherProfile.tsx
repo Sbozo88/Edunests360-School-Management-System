@@ -18,9 +18,9 @@ const getMockDetails = (id: string, name: string) => {
     // Simple hash function for deterministic random data
     const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + name.length;
 
-    const degrees = ['Bachelor of Music', 'Master of Education', 'PhD in Music Theory', 'Diploma in Performing Arts'];
-    const unis = ['Berklee College of Music', 'Royal Academy of Music', 'Juilliard School', 'Conservatory of Amsterdam'];
-    const cities = ['Springfield', 'New York', 'Chicago', 'Boston', 'Seattle'];
+    const degrees = ['Bachelor of Education', 'Master of Education', 'Postgraduate Certificate in Education', 'Diploma in School Leadership'];
+    const unis = ['University of Johannesburg', 'University of the Witwatersrand', 'UNISA', 'University of Pretoria'];
+    const cities = ['Johannesburg', 'Lyndhurst', 'Rembrandt Park', 'Sandton', 'Edenvale'];
 
     return {
         address: `${(hash * 13) % 999 + 1} Maple Avenue, ${cities[hash % cities.length]}`,
@@ -30,7 +30,7 @@ const getMockDetails = (id: string, name: string) => {
         qualification: degrees[hash % degrees.length],
         university: unis[hash % unis.length],
         experience: `${(hash % 15) + 3} Years`,
-        bio: `${name} is a dedicated educator with over ${(hash % 15) + 3} years of experience in music education. They obtained their ${degrees[hash % degrees.length]} from ${unis[hash % unis.length]} and have been a valuable member of our faculty since 20${(hash % 8) + 15}.`
+        bio: `${name} is a dedicated educator with over ${(hash % 15) + 3} years of experience in primary education. They obtained their ${degrees[hash % degrees.length]} from ${unis[hash % unis.length]} and have been a valuable member of Rembrandt Park School since 20${(hash % 8) + 15}.`
     };
 };
 
@@ -45,7 +45,7 @@ export const TeacherProfile: React.FC<TeacherProfileProps> = ({ userRole, id }) 
     const initialData = {
         ...foundTeacher,
         ...mockDetails,
-        department: 'Music Department',
+        department: foundTeacher.subject.includes('Foundation') ? 'Foundation Phase' : foundTeacher.subject.includes('Intersen') ? 'Intersen Phase' : 'Specialist / Management',
         avatar: `https://ui-avatars.com/api/?name=${foundTeacher.name.replace(' ', '+')}&background=random&size=256`
     };
 
@@ -59,7 +59,7 @@ export const TeacherProfile: React.FC<TeacherProfileProps> = ({ userRole, id }) 
             setTeacher({
                 ...newFound,
                 ...newMock,
-                department: 'Music Department',
+                department: newFound.subject.includes('Foundation') ? 'Foundation Phase' : newFound.subject.includes('Intersen') ? 'Intersen Phase' : 'Specialist / Management',
                 avatar: `https://ui-avatars.com/api/?name=${newFound.name.replace(' ', '+')}&background=random&size=256`
             });
         }
@@ -84,7 +84,7 @@ export const TeacherProfile: React.FC<TeacherProfileProps> = ({ userRole, id }) 
         setTeacher({
             ...original,
             ...originalMock,
-            department: 'Music Department',
+            department: original.subject.includes('Foundation') ? 'Foundation Phase' : original.subject.includes('Intersen') ? 'Intersen Phase' : 'Specialist / Management',
             avatar: `https://ui-avatars.com/api/?name=${original.name.replace(' ', '+')}&background=random&size=256`
         });
         setIsEditing(false);
@@ -346,14 +346,14 @@ export const TeacherProfile: React.FC<TeacherProfileProps> = ({ userRole, id }) 
                                                     <div className="flex gap-3 items-center">
                                                         <span className="px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-md font-mono">08:30 - 09:30</span>
                                                         <div>
-                                                            <p className="text-sm font-bold text-slate-800">Beginner Violin</p>
+                                                            <p className="text-sm font-bold text-slate-800">English HL</p>
                                                             <p className="text-xs text-slate-500">Room 2 Blk A</p>
                                                         </div>
                                                     </div>
                                                     <div className="flex gap-3 items-center">
                                                         <span className="px-2.5 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-md font-mono">09:30 - 10:30</span>
                                                         <div>
-                                                            <p className="text-sm font-bold text-slate-800">Orchestra Practice</p>
+                                                            <p className="text-sm font-bold text-slate-800">Coding and Robotics</p>
                                                             <p className="text-xs text-slate-500">Main Hall</p>
                                                         </div>
                                                     </div>

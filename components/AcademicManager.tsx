@@ -78,18 +78,18 @@ const BrassInstrumentIcon = ({ size = 24, ...props }: any) => (
 
 // --- Mock Data Initialization ---
 const MASTER_SUBJECTS = [
-  'Marimba – Practical Musicianship',
-  'Recorder – Practical Musicianship',
-  'Trumpet – Practical Musicianship',
-  'Clarinet – Practical Musicianship',
-  'Flute – Practical Musicianship',
-  'Cello – Practical Musicianship',
-  'Viola – Practical Musicianship',
-  'Applied Dance',
-  'Violin – Practical Musicianship',
-  'Rudiments of Dance',
-  'Rudiments of Music',
-  'Ensemble Skills'
+  'English Home Language',
+  'Afrikaans First Additional Language',
+  'isiZulu First Additional Language',
+  'Mathematics',
+  'Life Skills',
+  'Natural Sciences',
+  'Social Sciences',
+  'Economic and Management Sciences',
+  'Technology',
+  'Coding and Robotics',
+  'Creative Arts',
+  'Physical Education'
 ];
 
 // Mapping central data to local structure
@@ -100,44 +100,30 @@ const INITIAL_TEACHERS: Teacher[] = DATA_TEACHERS.map(t => ({
 }));
 
 const INITIAL_SECTIONS: Section[] = [
-  { id: 'SEC-01', name: 'Music Department' },
-  { id: 'SEC-02', name: 'Dance Department' },
-  { id: 'SEC-03', name: 'Theory & History' },
+  { id: 'SEC-FP', name: 'Foundation Phase' },
+  { id: 'SEC-IP', name: 'Intersen Phase' },
+  { id: 'SEC-SP', name: 'Specialist Subjects' },
 ];
 
-// Generate the requested 20 rooms
 const generateInitialRooms = (): Classroom[] => {
-  const rooms: Classroom[] = [];
-  const blocks = ['A', 'B', 'C'];
-  let srNo = 1;
-
-  // Blocks A, B, C (Rooms 1-6 each)
-  blocks.forEach(block => {
-    for (let i = 1; i <= 6; i++) {
-      rooms.push({
-        id: `RM-${srNo}`,
-        name: `Room ${i} Blk ${block}`,
-        capacity: 30,
-        status: 'Active'
-      });
-      srNo++;
-    }
-  });
-
-  // Additional Rooms
-  rooms.push({ id: `RM-${srNo++}`, name: 'Prayer Room', capacity: 30, status: 'Active' });
-  rooms.push({ id: `RM-${srNo++}`, name: 'New Room', capacity: 30, status: 'Active' });
-
-  return rooms;
+  const roomNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 29, 30, 31, 32, 33];
+  return roomNumbers.map((room) => ({
+    id: `RM-${room}`,
+    name: `Room ${room}`,
+    capacity: 32,
+    status: 'Active'
+  }));
 };
 
 const INITIAL_ROOMS: Classroom[] = generateInitialRooms();
 
 
 const INITIAL_SUBJECTS: Subject[] = [
-  { id: 'SUB-01', name: 'Violin – Practical Musicianship', classId: 'CLS-01', teacherId: 'TCH-002' },
-  { id: 'SUB-02', name: 'Ensemble Skills', classId: 'CLS-01', teacherId: 'TCH-002' },
-  { id: 'SUB-03', name: 'Recorder – Practical Musicianship', classId: 'CLS-09', teacherId: 'TCH-1010' },
+  { id: 'SUB-ENG', name: 'English Home Language', classId: 'CLS-7T', teacherId: 'TCH-009' },
+  { id: 'SUB-MATH', name: 'Mathematics', classId: 'CLS-7T', teacherId: 'TCH-009' },
+  { id: 'SUB-CODING', name: 'Coding and Robotics', classId: 'CLS-4M', teacherId: 'TCH-012' },
+  { id: 'SUB-ZULU', name: 'Zulu Grades 1-3', classId: 'CLS-3N', teacherId: 'TCH-013' },
+  { id: 'SUB-SPORT', name: 'Physical Education', classId: 'CLS-7N', teacherId: 'TCH-014' },
 ];
 
 
@@ -867,7 +853,7 @@ export const AcademicManager: React.FC<AcademicManagerProps> = ({ view, userRole
               type="text"
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
-              placeholder="e.g. Music Department, Dance"
+              placeholder="e.g. Foundation Phase, Intersen Phase"
               className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none"
             />
           </div>
@@ -971,7 +957,7 @@ export const AcademicManager: React.FC<AcademicManagerProps> = ({ view, userRole
                 type="text"
                 value={newClassData.name}
                 onChange={(e) => setNewClassData({ ...newClassData, name: e.target.value })}
-                placeholder="e.g. Violin Advanced"
+                placeholder="e.g. 4M, 7T, RA"
                 className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none"
               />
             </div>

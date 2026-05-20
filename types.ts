@@ -35,7 +35,7 @@ export interface Invoice {
   amount: number;
   status: 'Paid' | 'Unpaid' | 'Pending' | 'Overdue';
   date: string;
-  type: 'Tuition' | 'Transport' | 'Library' | 'Exam';
+  type: 'School Fees' | 'Tuition' | 'Transport' | 'Library' | 'Exam';
 }
 
 export interface ChartDataPoint {

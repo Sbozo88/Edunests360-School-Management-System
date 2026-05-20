@@ -11,7 +11,7 @@ interface ExamManagerProps {
 export const ExamManager: React.FC<ExamManagerProps> = ({ userRole }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [exams, setExams] = useState([
-    { id: 1, title: 'Mid-Term Mathematics', grade: 'Grade 10', date: 'Oct 10', time: '09:00 AM - 12:00 PM', hall: 'Hall A' },
+    { id: 1, title: 'Term Mathematics Assessment', grade: 'Grade 7', date: 'Mar 10', time: '09:00 AM - 11:00 AM', hall: 'Hall A' },
     { id: 2, title: 'Physics Practical', grade: 'Grade 11', date: 'Oct 12', time: '10:00 AM - 01:00 PM', hall: 'Lab 2' },
     { id: 3, title: 'English Literature', grade: 'Grade 9', date: 'Oct 15', time: '09:00 AM - 11:30 AM', hall: 'Hall B' }
   ]);
@@ -127,7 +127,7 @@ export const ExamManager: React.FC<ExamManagerProps> = ({ userRole }) => {
               <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Grade</label>
-                    <input type="text" value={newExam.grade} onChange={(e) => setNewExam({...newExam, grade: e.target.value})} className="w-full p-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-100" placeholder="e.g. Grade 10" />
+                    <input type="text" value={newExam.grade} onChange={(e) => setNewExam({...newExam, grade: e.target.value})} className="w-full p-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-100" placeholder="e.g. Grade 7" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Hall/Room</label>

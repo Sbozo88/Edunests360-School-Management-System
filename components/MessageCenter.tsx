@@ -11,7 +11,7 @@ interface Message {
 
 const INITIAL_MESSAGES: Message[] = [
     { id: 1, text: 'Hello Mr. Anderson, I wanted to ask about the field trip schedule.', sender: 'other', time: '10:30 AM' },
-    { id: 2, text: 'Hi! The bus leaves at 9:00 AM sharp on Friday. Make sure Alex packs a lunch.', sender: 'me', time: '10:32 AM' }
+    { id: 2, text: 'Hi! The school transport leaves at 14:15 sharp on Friday. Please make sure the learner has lunch packed.', sender: 'me', time: '10:32 AM' }
 ];
 
 export const MessageCenter: React.FC = () => {

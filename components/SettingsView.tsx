@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card } from './ui/Card';
 import { Bell, Download, FileText, Palette, Globe, Lock, User, BookOpen, GraduationCap, Phone, Mail, MapPin, Calendar, Shield } from 'lucide-react';
 import { UserRole } from '../types';
-import { INITIAL_STUDENTS, INITIAL_TEACHERS } from '../data';
+import { INITIAL_STUDENTS, INITIAL_TEACHERS, SCHOOL_PROFILE } from '../data';
 
 interface SettingsViewProps {
   view: 'settings' | 'reports';
@@ -15,15 +15,15 @@ interface SettingsViewProps {
 const getProfileData = (role: UserRole) => {
   switch (role) {
     case UserRole.SUPER_ADMIN:
-      return { name: 'Mr. Anderson', title: 'Super Administrator', email: 'admin@edunests365.co.za', phone: '+27 11 234 5678', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80' };
+      return { name: 'Ms Seema', title: 'Principal / Super Administrator', email: SCHOOL_PROFILE.emails[0], phone: SCHOOL_PROFILE.contactNumber, avatar: 'https://ui-avatars.com/api/?name=Ms+Seema&background=6366f1&color=fff&size=256' };
     case UserRole.ADMIN:
-      return { name: 'Mrs. Nkosi', title: 'School Administrator', email: 'nkosi@edunests365.co.za', phone: '+27 11 234 5679', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80' };
+      return { name: 'Mr Skhosana', title: 'School Administrator', email: SCHOOL_PROFILE.emails[1], phone: SCHOOL_PROFILE.contactNumber, avatar: 'https://ui-avatars.com/api/?name=Mr+Skhosana&background=4f46e5&color=fff&size=256' };
     case UserRole.TEACHER:
-      return { name: INITIAL_TEACHERS[0]?.name || 'Isaac Molelekwa', title: INITIAL_TEACHERS[0]?.subject || 'Violin Trainer', email: INITIAL_TEACHERS[0]?.email || 'isaac@demo.com', phone: '+27 82 345 6789', avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(INITIAL_TEACHERS[0]?.name || 'Isaac')}&background=6366f1&color=fff&size=256` };
+      return { name: INITIAL_TEACHERS[0]?.name || 'Ms Seema', title: INITIAL_TEACHERS[0]?.subject || 'Principal', email: INITIAL_TEACHERS[0]?.email || SCHOOL_PROFILE.emails[0], phone: SCHOOL_PROFILE.contactNumber, avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(INITIAL_TEACHERS[0]?.name || 'Ms Seema')}&background=6366f1&color=fff&size=256` };
     case UserRole.STUDENT:
-      return { name: INITIAL_STUDENTS[0]?.name || 'Alex Morgan', title: `Class ${INITIAL_STUDENTS[0]?.class || '10-A'}`, email: INITIAL_STUDENTS[0]?.email || 'alex@school.com', phone: '+27 73 456 7890', avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(INITIAL_STUDENTS[0]?.name || 'Alex')}&background=3b82f6&color=fff&size=256` };
+      return { name: INITIAL_STUDENTS[0]?.name || 'Sithembiso', title: `Class ${INITIAL_STUDENTS[0]?.class || '7T'}`, email: INITIAL_STUDENTS[0]?.email || 'learner@rempark.co.za', phone: SCHOOL_PROFILE.contactNumber, avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(INITIAL_STUDENTS[0]?.name || 'Sithembiso')}&background=3b82f6&color=fff&size=256` };
     case UserRole.PARENT:
-      return { name: 'Robert Morgan', title: `Parent of ${INITIAL_STUDENTS[0]?.name || 'Alex Morgan'}`, email: 'robert.morgan@email.co.za', phone: '+27 84 567 8901', avatar: `https://ui-avatars.com/api/?name=Robert+Morgan&background=10b981&color=fff&size=256` };
+      return { name: 'RPS Parent 1', title: `Parent of ${INITIAL_STUDENTS[0]?.name || 'Sithembiso'}`, email: 'parent1@rempark.co.za', phone: SCHOOL_PROFILE.contactNumber, avatar: `https://ui-avatars.com/api/?name=RPS+Parent+1&background=10b981&color=fff&size=256` };
     default:
       return { name: 'User', title: 'User', email: 'user@school.com', phone: '', avatar: '' };
   }

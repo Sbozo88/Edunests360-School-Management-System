@@ -33,7 +33,7 @@ export const AttendanceRegister: React.FC = () => {
 
   // Biometric State
   const [logs, setLogs] = useState<BiometricLog[]>([
-    { id: '1', name: 'Isaac Molelekwa', role: 'Teacher', time: '07:45:12 AM', location: 'Main Gate', status: 'Success' },
+    { id: '1', name: 'Ms Seema', role: 'Principal', time: '07:15:12 AM', location: 'Main Gate', status: 'Success' },
     { id: '2', name: 'Lehlohonolo Mokoena', role: 'Staff', time: '07:50:05 AM', location: 'Reception', status: 'Success' },
     { id: '3', name: 'Gloria Boyi', role: 'Teacher', time: '08:05:30 AM', location: 'Main Gate', status: 'Success' },
     { id: '4', name: 'Unknown User', role: 'Guest', time: '08:10:11 AM', location: 'Main Gate', status: 'Failed' },

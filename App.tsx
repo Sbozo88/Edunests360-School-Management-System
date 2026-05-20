@@ -21,6 +21,7 @@ import { AttendanceRegister } from './components/AttendanceRegister';
 import { HomeworkManager } from './components/HomeworkManager';
 import { Menu, Bell, Search, ChevronDown, ShieldAlert, GraduationCap, Users, User, Shield, LogOut, Loader2, Settings, HelpCircle, FileText, ChevronRight, Command } from 'lucide-react';
 import { Card } from './components/ui/Card';
+import { SCHOOL_PROFILE } from './data';
 
 // ==========================================
 // Login Screen — Premium Redesign
@@ -57,14 +58,14 @@ const LoginScreen = ({ onLogin }: { onLogin: (role: UserRole) => void }) => {
         <div className="text-center mb-12 animate-fade-in-up">
           <div className="relative w-20 h-20 mx-auto mb-6 group">
             <div className="w-20 h-20 bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 rounded-2xl flex items-center justify-center text-white font-extrabold text-4xl shadow-xl shadow-indigo-200/50 transform transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3">
-              E
+              R
             </div>
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl opacity-30 blur-xl animate-pulse-glow -z-10"></div>
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-3 tracking-tight">
-            Welcome to <span className="text-gradient-brand">Edunets</span><span className="text-gradient-accent">365</span>
+            Welcome to <span className="text-gradient-brand">{SCHOOL_PROFILE.name}</span>
           </h1>
-          <p className="text-slate-500 text-lg">Select a demo account to explore the platform</p>
+          <p className="text-slate-500 text-lg">{SCHOOL_PROFILE.motto} · Select a demo account to explore the platform</p>
         </div>
 
         {/* Role Cards Grid */}
@@ -115,8 +116,8 @@ const LoginScreen = ({ onLogin }: { onLogin: (role: UserRole) => void }) => {
         {/* Footer */}
         <div className="mt-14 text-center animate-fade-in">
           <p className="text-xs text-slate-400">
-            &copy; 2026 Edunets365 School Management System <span className="mx-1.5 opacity-40">·</span> v1.0.0 <br />
-            <span className="text-slate-300 mt-1 block">Designed for modern educational institutions</span>
+            &copy; 2026 {SCHOOL_PROFILE.name} School Management System <span className="mx-1.5 opacity-40">·</span> v1.0.0 <br />
+            <span className="text-slate-300 mt-1 block">{SCHOOL_PROFILE.sector} · EMIS {SCHOOL_PROFILE.emisNumber}</span>
           </p>
         </div>
       </div>
@@ -329,12 +330,11 @@ const App: React.FC = () => {
         {/* Sidebar Header */}
         <div className="h-20 flex items-center gap-3 px-6 border-b border-slate-100/50 shrink-0">
           <div className="w-9 h-9 bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-indigo-200/50 shrink-0">
-            E
+            R
           </div>
           {isSidebarOpen && (
             <span className="text-xl font-extrabold whitespace-nowrap tracking-tight">
-              <span className="text-gradient-brand">Edunets</span>
-              <span className="text-gradient-accent">365</span>
+              <span className="text-gradient-brand">{SCHOOL_PROFILE.shortName}</span>
             </span>
           )}
         </div>

@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { Printer, X, Download } from 'lucide-react';
 import { Student } from '../types';
+import { SCHOOL_PROFILE } from '../data';
 
 interface StudentIdCardProps {
   student: Student | any; // accepting any for compatibility with local types
@@ -11,8 +12,8 @@ interface StudentIdCardProps {
 
 export const StudentIdCard: React.FC<StudentIdCardProps> = ({ 
   student, 
-  schoolName = "Edunets365 High School",
-  schoolAddress = "123 Education Lane, Knowledge City",
+  schoolName = SCHOOL_PROFILE.name,
+  schoolAddress = SCHOOL_PROFILE.physicalAddress,
   onClose
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);

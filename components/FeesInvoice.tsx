@@ -3,7 +3,7 @@ import { Card } from './ui/Card';
 import { Invoice, UserRole } from '../types';
 import { formatCurrency } from '../locale';
 import { Download, Eye, Filter, MoreHorizontal, Printer, Search, Trash2, FileText, CheckCircle, Plus, Layers, Settings } from 'lucide-react';
-import { INITIAL_INVOICES } from '../data';
+import { INITIAL_INVOICES, SCHOOL_PROFILE } from '../data';
 import { Modal } from './ui/Modal';
 import { getInvoices } from '../src/api';
 
@@ -37,11 +37,11 @@ interface FeeType {
 }
 
 const INITIAL_FEE_TYPES: FeeType[] = [
-    { id: '1', name: 'Tuition Fee - Primary', amount: 8100, frequency: 'Monthly', group: 'Academics' },
-    { id: '2', name: 'Tuition Fee - Secondary', amount: 9900, frequency: 'Monthly', group: 'Academics' },
-    { id: '3', name: 'Lab Fee', amount: 1800, frequency: 'Annual', group: 'Facilities' },
-    { id: '4', name: 'Transport Zone A', amount: 2160, frequency: 'Monthly', group: 'Transport' },
-    { id: '5', name: 'Admission Fee', amount: 36000, frequency: 'One-Time', group: 'Admission' },
+    { id: '1', name: 'Annual School Fees', amount: SCHOOL_PROFILE.standardAnnualFee, frequency: 'Annual', group: 'School Fees' },
+    { id: '2', name: 'Term Payment Plan', amount: SCHOOL_PROFILE.standardAnnualFee / 4, frequency: 'Annual', group: 'School Fees' },
+    { id: '3', name: 'Extra-Mural Activity Fee', amount: 650, frequency: 'Annual', group: 'Extra-Curricular' },
+    { id: '4', name: 'Swimming Programme', amount: 850, frequency: 'Annual', group: 'Sports' },
+    { id: '5', name: 'Music Lessons', amount: 1200, frequency: 'Annual', group: 'Extra-Curricular' },
 ];
 
 export const FeesInvoice: React.FC<FeesInvoiceProps> = ({ userRole }) => {
@@ -63,8 +63,8 @@ export const FeesInvoice: React.FC<FeesInvoiceProps> = ({ userRole }) => {
             // Actually, let's just use the data as is.
             setInvoices(data.map((inv: any) => ({
                 ...inv,
-                studentId: inv.student_id, // Map DB field to frontend field
-                invoiceNo: inv.id // Using ID as invoice no for now
+                studentId: inv.studentId ?? inv.student_id,
+                invoiceNo: inv.invoiceNo ?? inv.id
             })));
         } catch (err: any) {
             console.error("Failed to load invoices:", err);

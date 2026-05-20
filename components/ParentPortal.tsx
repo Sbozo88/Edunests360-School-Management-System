@@ -14,7 +14,7 @@ interface ParentPortalProps {
 }
 
 // Mock parent session
-const CURRENT_PARENT_NAME = "Robert Morgan";
+const CURRENT_PARENT_NAME = "RPS Parent 1";
 
 const attendanceData = [
    { name: 'Mon', present: 1 },
