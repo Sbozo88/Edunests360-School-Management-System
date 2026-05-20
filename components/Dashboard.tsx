@@ -57,10 +57,10 @@ const StatCard = ({ title, value, trend, icon: Icon, gradient, bgLight, textColo
     onClick={onClick}
   >
     <div className={`absolute -right-4 -top-4 w-20 h-20 rounded-full opacity-[0.08] bg-gradient-to-br ${gradient}`}></div>
-    <div className="relative z-10 flex justify-between items-start">
-      <div>
+    <div className="relative z-10 flex justify-between items-start gap-4">
+      <div className="min-w-0 flex-1">
         <p className="text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">{title}</p>
-        <h4 className="text-2xl font-extrabold text-slate-800 stat-value tracking-tight">{value}</h4>
+        <h4 className="text-2xl font-extrabold text-slate-800 stat-value leading-tight break-words">{value}</h4>
         {trend !== undefined ? (
           <div className="flex items-center mt-2.5 gap-1.5">
             <span className={`text-[11px] font-bold px-2 py-0.5 rounded-md ${trend > 0 ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
@@ -75,7 +75,7 @@ const StatCard = ({ title, value, trend, icon: Icon, gradient, bgLight, textColo
           </div>
         )}
       </div>
-      <div className={`p-3 rounded-xl bg-gradient-to-br ${gradient} text-white shadow-lg shadow-${textColor.replace('text-', '')}/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+      <div className={`w-14 h-14 shrink-0 rounded-xl bg-gradient-to-br ${gradient} text-white shadow-lg shadow-${textColor.replace('text-', '')}/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 flex items-center justify-center`}>
         <Icon size={22} strokeWidth={2} />
       </div>
     </div>
