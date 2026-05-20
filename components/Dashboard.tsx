@@ -116,6 +116,9 @@ const AdminDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const totalStudents = stats?.totalStudents ?? INITIAL_STUDENTS.length;
   const totalTeachers = stats?.totalTeachers ?? INITIAL_TEACHERS.length;
   const totalStaff = stats?.totalStaff ?? INITIAL_STAFF.length;
+  const totalSubjects = stats?.totalSubjects ?? 0;
+  const totalRoutines = stats?.totalRoutines ?? 0;
+  const totalInvoices = stats?.totalInvoices ?? INITIAL_INVOICES.length;
   const totalRevenue = stats?.totalRevenue ?? INITIAL_INVOICES.reduce((sum, inv) => inv.status === 'Paid' ? sum + inv.amount : sum, 0);
   const chartFinancialData = stats?.financialData ?? financialData;
   const recentCollections = stats?.recentCollections ?? INITIAL_INVOICES.slice(0, 3);
@@ -276,6 +279,12 @@ const AdminDashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       </div>
 
       {/* Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 opacity-0 animate-fade-in-up stagger-6">
+        <StatCard title="CAPS Subjects" value={totalSubjects.toString()} icon={BookOpen} gradient="from-sky-500 to-blue-600" bgLight="bg-sky-50" textColor="text-sky-600" subtext="Live Firestore" onClick={() => onNavigate('subjects')} />
+        <StatCard title="Weekly Routines" value={totalRoutines.toString()} icon={Clock} gradient="from-violet-500 to-indigo-600" bgLight="bg-violet-50" textColor="text-violet-600" subtext="Live Firestore" onClick={() => onNavigate('timetable')} />
+        <StatCard title="Invoices" value={totalInvoices.toString()} icon={ClipboardList} gradient="from-rose-500 to-pink-600" bgLight="bg-rose-50" textColor="text-rose-600" subtext="Live Firestore" onClick={() => onNavigate('fees')} />
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 opacity-0 animate-fade-in-up stagger-6">
         <Card className="lg:col-span-2" title="Financial Overview" action={<button onClick={() => onNavigate('expenses')} className="text-slate-400 hover:text-slate-600 transition-colors"><MoreHorizontal size={18} /></button>}>
           <div className="h-[280px] w-full">

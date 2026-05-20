@@ -612,11 +612,14 @@ app.get("/api/invoices", async (req, res) => {
 
 app.get("/api/dashboard", async (_req, res) => {
   try {
-    const [students, teachers, staff, invoices] = await Promise.all([
+    const [students, teachers, staff, invoices, classes, subjects, routines] = await Promise.all([
       getCollection("students"),
       getCollection("teachers"),
       getCollection("staff"),
-      getCollection("invoices")
+      getCollection("invoices"),
+      getCollection("classes"),
+      getCollection("subjects"),
+      getCollection("routines")
     ]);
     const studentNames = Object.fromEntries(students.map((student) => [student.id, student.name]));
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
@@ -646,6 +649,10 @@ app.get("/api/dashboard", async (_req, res) => {
       totalStudents: students.length,
       totalTeachers: teachers.length,
       totalStaff: staff.length || 15,
+      totalClasses: classes.length,
+      totalSubjects: subjects.length,
+      totalRoutines: routines.length,
+      totalInvoices: invoices.length,
       totalRevenue,
       recentCollections,
       financialData
