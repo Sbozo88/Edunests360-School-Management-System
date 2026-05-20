@@ -4,7 +4,7 @@
   "description": "Firebase Functions API for Edunests365 RPS",
   "main": "index.js",
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "scripts": {
     "lint": "node --check index.js"
